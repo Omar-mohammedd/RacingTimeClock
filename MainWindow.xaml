@@ -1,0 +1,58 @@
+﻿<Window x:Class="RacingTimeClock.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Racing Time Clock"
+        Width="1200"
+        Height="700"
+        MinWidth="900"
+        MinHeight="600"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0"
+                Background="#20232A">
+
+            <StackPanel>
+
+                <TextBlock Text="RACING"
+                           Foreground="White"
+                           FontSize="24"
+                           FontWeight="Bold"
+                           Margin="25,30,25,0"/>
+
+                <TextBlock Text="TIME CLOCK"
+                           Foreground="#AAAAAA"
+                           FontSize="16"
+                           Margin="25,0,25,40"/>
+
+                <Button Content="🏁  New Race"
+                        Height="55"
+                        Margin="15,0,15,10"
+                        Click="NewRace_Click"/>
+
+                <Button Content="👤  Racers"
+                        Height="55"
+                        Margin="15,0,15,10"
+                        Click="Racers_Click"/>
+
+                <Button Content="📋  Races Log"
+                        Height="55"
+                        Margin="15,0,15,10"
+                        Click="RacesLog_Click"/>
+
+            </StackPanel>
+
+        </Border>
+
+        <ContentControl Grid.Column="1"
+                        x:Name="PageContent"/>
+
+    </Grid>
+
+</Window>

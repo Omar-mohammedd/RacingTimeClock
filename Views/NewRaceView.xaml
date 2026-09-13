@@ -1,0 +1,89 @@
+<UserControl x:Class="RacingTimeClock.Views.NewRaceView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Background="#F5F6F8">
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+
+            <StackPanel Margin="45">
+
+                <!-- Page Title -->
+                <TextBlock Text="New Race"
+                           FontSize="32"
+                           FontWeight="Bold"
+                           Foreground="#20232A"/>
+
+                <TextBlock Text="Set up the race before starting the clock."
+                           FontSize="15"
+                           Foreground="#777777"
+                           Margin="0,5,0,35"/>
+
+
+                <!-- Race Type -->
+                <TextBlock Text="Race Type"
+                           FontSize="18"
+                           FontWeight="SemiBold"
+                           Foreground="#20232A"
+                           Margin="0,0,0,12"/>
+
+                <StackPanel Orientation="Horizontal">
+
+                    <Button x:Name="ShortButton"
+                            Content="SHORT"
+                            Width="140"
+                            Height="50"
+                            Margin="0,0,10,0"
+                            FontSize="15"
+                            FontWeight="Bold"
+                            Click="ShortButton_Click"/>
+
+                    <Button x:Name="LongButton"
+                            Content="LONG"
+                            Width="140"
+                            Height="50"
+                            FontSize="15"
+                            FontWeight="Bold"
+                            Click="LongButton_Click"/>
+
+                </StackPanel>
+
+
+                <!-- Distance -->
+                <TextBlock Text="Distance"
+                           FontSize="18"
+                           FontWeight="SemiBold"
+                           Foreground="#20232A"
+                           Margin="0,35,0,12"/>
+
+                <WrapPanel x:Name="DistancePanel"/>
+
+
+                <!-- Number of Racers -->
+                <TextBlock Text="Number of Racers"
+                           FontSize="18"
+                           FontWeight="SemiBold"
+                           Foreground="#20232A"
+                           Margin="0,35,0,12"/>
+
+                <WrapPanel x:Name="RacerCountPanel"/>
+
+
+                <!-- Start Race -->
+                <Button x:Name="StartRaceButton"
+                        Content="START RACE"
+                        Width="200"
+                        Height="60"
+                        Margin="0,45,0,0"
+                        HorizontalAlignment="Left"
+                        FontSize="18"
+                        FontWeight="Bold"
+                        Click="StartRaceButton_Click"/>
+
+            </StackPanel>
+
+        </ScrollViewer>
+
+    </Grid>
+
+</UserControl>

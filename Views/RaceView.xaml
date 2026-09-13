@@ -1,0 +1,116 @@
+﻿<UserControl x:Class="RacingTimeClock.Views.RaceView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Focusable="True">
+
+    <Grid Background="#F5F6F8">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="40,30,40,20">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel>
+
+                <TextBlock x:Name="RaceTitleText"
+                           Text="1000m Race"
+                           FontSize="32"
+                           FontWeight="Bold"
+                           Foreground="#20232A"/>
+
+                <TextBlock x:Name="RaceInfoText"
+                           FontSize="15"
+                           Foreground="#777777"
+                           Margin="0,5,0,0"/>
+
+            </StackPanel>
+
+            <StackPanel Grid.Column="1"
+                        HorizontalAlignment="Right">
+
+                <TextBlock Text="RACE TIME"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           Foreground="#777777"
+                           HorizontalAlignment="Right"/>
+
+                <TextBlock x:Name="TimerText"
+                           Text="00:00.000"
+                           FontSize="42"
+                           FontWeight="Bold"
+                           Foreground="#20232A"
+                           HorizontalAlignment="Right"/>
+
+            </StackPanel>
+
+        </Grid>
+
+        <Grid Grid.Row="1"
+              Margin="40,0,40,40">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0"
+                    Background="White"
+                    CornerRadius="8"
+                    Padding="20"
+                    Margin="0,0,0,15">
+
+                <TextBlock x:Name="StatusText"
+                           Text="PRESS SPACE TO START"
+                           FontSize="22"
+                           FontWeight="Bold"
+                           Foreground="#20232A"
+                           HorizontalAlignment="Center"/>
+
+            </Border>
+
+            <ScrollViewer Grid.Row="1"
+                          VerticalScrollBarVisibility="Auto">
+
+                <StackPanel x:Name="RacersPanel"/>
+
+            </ScrollViewer>
+
+            <StackPanel Grid.Row="2">
+
+                <Button x:Name="SaveRaceButton"
+                        Content="SAVE RACE"
+                        Width="200"
+                        Height="55"
+                        HorizontalAlignment="Center"
+                        Margin="0,15,0,10"
+                        FontSize="17"
+                        FontWeight="Bold"
+                        Visibility="Collapsed"
+                        Click="SaveRaceButton_Click"/>
+
+                <Border Background="#20232A"
+                        CornerRadius="8"
+                        Padding="15">
+
+                    <TextBlock Text="SPACE = START    |    1-9 = FINISH RACER"
+                               Foreground="White"
+                               FontSize="15"
+                               HorizontalAlignment="Center"/>
+
+                </Border>
+
+            </StackPanel>
+
+        </Grid>
+
+    </Grid>
+
+</UserControl>

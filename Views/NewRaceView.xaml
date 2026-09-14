@@ -18,28 +18,13 @@
                            Foreground="#777777"
                            Margin="0,5,0,35"/>
 
-                <!-- Season -->
-
-                <TextBlock Text="Season"
-                           FontSize="18"
-                           FontWeight="SemiBold"
-                           Foreground="#20232A"
-                           Margin="0,0,0,12"/>
-
-                <ComboBox x:Name="SeasonComboBox"
-                          Width="220"
-                          Height="40"
-                          HorizontalAlignment="Left"
-                          FontSize="15"
-                          SelectionChanged="SeasonComboBox_SelectionChanged"/>
-
                 <!-- Category -->
 
                 <TextBlock Text="Category"
                            FontSize="18"
                            FontWeight="SemiBold"
                            Foreground="#20232A"
-                           Margin="0,30,0,12"/>
+                           Margin="0,0,0,12"/>
 
                 <StackPanel Orientation="Horizontal">
 
@@ -68,6 +53,14 @@
                             FontSize="14"
                             FontWeight="Bold"
                             Click="JuniorCategoryButton_Click"/>
+
+                    <Button x:Name="YouthCategoryButton"
+                            Content="YOUTH"
+                            Width="120"
+                            Height="45"
+                            FontSize="14"
+                            FontWeight="Bold"
+                            Click="YouthCategoryButton_Click"/>
 
                 </StackPanel>
 

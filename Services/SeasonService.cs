@@ -18,16 +18,15 @@ public static class SeasonService
         Racer racer,
         Season season)
     {
-        int seniorCutoff =
-            season.StartYear - 18;
-
-        int youthCutoff =
-            season.StartYear - 14;
+        int seniorCutoff = season.StartYear - 18;
+        int juniorMinimum = season.StartYear - 17;
+        int juniorMaximum = season.StartYear - 14;
 
         if (racer.YearOfBirth <= seniorCutoff)
             return "Senior";
 
-        if (racer.YearOfBirth < youthCutoff)
+        if (racer.YearOfBirth >= juniorMinimum &&
+            racer.YearOfBirth <= juniorMaximum)
             return "Junior";
 
         return "Youth";
@@ -67,7 +66,6 @@ public static class SeasonService
                 .FirstOrDefault();
 
         return exactSeason
-            ?? seasons.OrderBy(s => s.StartYear)
-                      .First();
+            ?? seasons.OrderBy(s => s.StartYear).First();
     }
 }

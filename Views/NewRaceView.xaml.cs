@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +8,7 @@ using System.Windows.Media;
 using Microsoft.EntityFrameworkCore;
 using RacingTimeClock.Data;
 using RacingTimeClock.Models;
+using RacingTimeClock.Services;
 
 namespace RacingTimeClock.Views;
 
@@ -16,12 +17,8 @@ public partial class NewRaceView : UserControl
     private string selectedRaceType = "Short";
     private string selectedDistance = "100m";
     private int selectedRacerCount = 1;
-
     private string selectedCategory = "All";
 
-    private int selectedSeasonId;
-
-    private List<Season> seasons = new();
     private List<Racer> availableRacers = new();
 
     private readonly List<ComboBox> racerComboBoxes = new();
@@ -68,7 +65,6 @@ public partial class NewRaceView : UserControl
 
         BuildDistanceButtons();
         BuildRacerCountButtons();
-
         UpdateRaceTypeButtons();
         UpdateDistanceButtons();
         UpdateRacerCountButtons();
@@ -91,36 +87,10 @@ public partial class NewRaceView : UserControl
             using RacingTimeClockDbContext db =
                 new RacingTimeClockDbContext();
 
-            seasons = await db.Seasons
-                .Where(s => s.IsActive)
-                .OrderByDescending(s => s.Id)
-                .ToListAsync();
-
             availableRacers = await db.Racers
                 .Where(r => r.IsActive)
                 .OrderBy(r => r.Name)
                 .ToListAsync();
-
-            if (seasons.Count == 0)
-            {
-                Season defaultSeason = new Season
-                {
-                    Name = "2026/27",
-                    StartYear = 2026,
-                    IsActive = true
-                };
-
-                db.Seasons.Add(defaultSeason);
-
-                await db.SaveChangesAsync();
-
-                seasons.Add(defaultSeason);
-            }
-
-            SeasonComboBox.ItemsSource = seasons;
-            SeasonComboBox.DisplayMemberPath = "Name";
-
-            SeasonComboBox.SelectedIndex = 0;
 
             RebuildRacerSelectionUI();
         }
@@ -134,25 +104,15 @@ public partial class NewRaceView : UserControl
         }
     }
 
-    private void SeasonComboBox_SelectionChanged(
-        object sender,
-        SelectionChangedEventArgs e)
+    private Season? GetSelectedSeason()
     {
-        if (SeasonComboBox.SelectedItem
-            is Season season)
-        {
-            selectedSeasonId = season.Id;
-
-            RebuildRacerSelectionUI();
-        }
+        return AppSeasonService.Instance.CurrentSeason;
     }
 
     private bool IsRacerInSelectedCategory(
         Racer racer)
     {
-        Season? season =
-            seasons.FirstOrDefault(
-                s => s.Id == selectedSeasonId);
+        Season? season = GetSelectedSeason();
 
         if (season == null)
             return false;
@@ -164,10 +124,10 @@ public partial class NewRaceView : UserControl
             season.StartYear - 17;
 
         int juniorMaximumBirthYear =
-            season.StartYear - 14;
+            season.StartYear - 15;
 
         int youthMinimumBirthYear =
-            season.StartYear - 13;
+            season.StartYear - 14;
 
         return selectedCategory switch
         {
@@ -188,10 +148,9 @@ public partial class NewRaceView : UserControl
     private void RebuildRacerSelectionUI()
     {
         RacerSelectionPanel.Children.Clear();
-
         racerComboBoxes.Clear();
 
-        if (selectedSeasonId == 0)
+        if (GetSelectedSeason() == null)
             return;
 
         List<Racer> filteredRacers =
@@ -282,7 +241,6 @@ public partial class NewRaceView : UserControl
         selectedCategory = "All";
 
         UpdateCategoryButtons();
-
         RebuildRacerSelectionUI();
     }
 
@@ -293,7 +251,6 @@ public partial class NewRaceView : UserControl
         selectedCategory = "Seniors";
 
         UpdateCategoryButtons();
-
         RebuildRacerSelectionUI();
     }
 
@@ -304,7 +261,16 @@ public partial class NewRaceView : UserControl
         selectedCategory = "Juniors";
 
         UpdateCategoryButtons();
+        RebuildRacerSelectionUI();
+    }
 
+    private void YouthCategoryButton_Click(
+        object sender,
+        RoutedEventArgs e)
+    {
+        selectedCategory = "Youth";
+
+        UpdateCategoryButtons();
         RebuildRacerSelectionUI();
     }
 
@@ -321,6 +287,10 @@ public partial class NewRaceView : UserControl
         SetButtonSelected(
             JuniorCategoryButton,
             selectedCategory == "Juniors");
+
+        SetButtonSelected(
+            YouthCategoryButton,
+            selectedCategory == "Youth");
     }
 
     private void ShortButton_Click(
@@ -428,7 +398,6 @@ public partial class NewRaceView : UserControl
             selectedRacerCount = count;
 
             UpdateRacerCountButtons();
-
             RebuildRacerSelectionUI();
         }
     }
@@ -508,10 +477,13 @@ public partial class NewRaceView : UserControl
     {
         ErrorText.Text = string.Empty;
 
-        if (selectedSeasonId == 0)
+        Season? season =
+            AppSeasonService.Instance.CurrentSeason;
+
+        if (season == null)
         {
             ErrorText.Text =
-                "Please select a season.";
+                "No season is selected. Please select a season in Settings.";
 
             return;
         }
@@ -561,10 +533,7 @@ public partial class NewRaceView : UserControl
             selectedDistance,
             selectedRaceType,
             selectedRacerCount,
-            selectedSeasonId,
+            season.Id,
             selections);
     }
 }
-
-
-

@@ -10,5 +10,9 @@ public class Racer
 
     public int YearOfBirth { get; set; }
 
+    public bool IsMale { get; set; }
+
     public bool IsActive { get; set; } = true;
+
+    public List<RacerResult> Results { get; set; } = new();
 }

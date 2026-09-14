@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using RacingTimeClock.Models;
 using RacingTimeClock.Services;
@@ -72,8 +75,12 @@ public partial class RacesLogView : UserControl
             Background = Brushes.White,
             CornerRadius = new CornerRadius(8),
             Padding = new Thickness(15),
-            Margin = new Thickness(0, 0, 0, 10)
+            Margin = new Thickness(0, 0, 0, 10),
+            Cursor = Cursors.Hand,
+            Tag = race
         };
+
+        row.MouseLeftButtonDown += RaceRow_MouseLeftButtonDown;
 
         Grid grid = new Grid();
 
@@ -98,19 +105,16 @@ public partial class RacesLogView : UserControl
         grid.ColumnDefinitions.Add(
             new ColumnDefinition
             {
-                Width = new GridLength(1)
+                Width = new GridLength(1, GridUnitType.Star)
             });
 
         TextBlock dateText = new TextBlock
         {
-            Text = race.StartDateTime.ToString(
-                "dd/MM/yyyy  HH:mm"),
+            Text = race.StartDateTime.ToString("dd/MM/yyyy  HH:mm"),
             FontSize = 16,
             FontWeight = FontWeights.SemiBold,
-            Foreground = new SolidColorBrush(
-                Color.FromRgb(32, 35, 42))
+            Foreground = new SolidColorBrush(Color.FromRgb(32, 35, 42))
         };
-
         Grid.SetColumn(dateText, 0);
 
         TextBlock raceText = new TextBlock
@@ -118,10 +122,8 @@ public partial class RacesLogView : UserControl
             Text = race.Distance,
             FontSize = 16,
             FontWeight = FontWeights.SemiBold,
-            Foreground = new SolidColorBrush(
-                Color.FromRgb(32, 35, 42))
+            Foreground = new SolidColorBrush(Color.FromRgb(32, 35, 42))
         };
-
         Grid.SetColumn(raceText, 1);
 
         TextBlock typeText = new TextBlock
@@ -130,7 +132,6 @@ public partial class RacesLogView : UserControl
             FontSize = 16,
             Foreground = Brushes.Gray
         };
-
         Grid.SetColumn(typeText, 2);
 
         TextBlock racersText = new TextBlock
@@ -139,7 +140,6 @@ public partial class RacesLogView : UserControl
             FontSize = 16,
             Foreground = Brushes.Gray
         };
-
         Grid.SetColumn(racersText, 3);
 
         grid.Children.Add(dateText);
@@ -150,5 +150,17 @@ public partial class RacesLogView : UserControl
         row.Child = grid;
 
         RacesPanel.Children.Add(row);
+    }
+
+    private void RaceRow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ClickCount == 2 && sender is Border border && border.Tag is Race race)
+        {
+            RaceDetailsDialog dialog = new RaceDetailsDialog(race.Id)
+            {
+                Owner = Window.GetWindow(this)
+            };
+            dialog.ShowDialog();
+        }
     }
 }

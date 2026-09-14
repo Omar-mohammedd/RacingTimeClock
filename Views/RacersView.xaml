@@ -3,130 +3,91 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Grid Background="#F5F6F8">
+        <StackPanel Margin="45">
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <StackPanel Grid.Row="0"
-                    Margin="40,30,40,20">
-
-            <TextBlock Text="Racers"
-                       FontSize="32"
-                       FontWeight="Bold"
-                       Foreground="#20232A"/>
-
-            <TextBlock Text="Manage registered racers."
-                       FontSize="15"
-                       Foreground="#777777"
-                       Margin="0,5,0,0"/>
-
-        </StackPanel>
-
-        <Border Grid.Row="1"
-                Background="White"
-                CornerRadius="8"
-                Padding="20"
-                Margin="40,0,40,15">
-
-            <Grid>
-
+            <!-- Page Header -->
+            <Grid Margin="0,0,0,20">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel>
-
-                    <TextBlock Text="Current Season"
-                               FontSize="14"
-                               FontWeight="SemiBold"
-                               Foreground="#777777"/>
-
-                    <ComboBox x:Name="SeasonComboBox"
-                              Width="180"
-                              Height="35"
-                              HorizontalAlignment="Left"
-                              Margin="0,5,0,0"
-                              SelectionChanged="SeasonComboBox_SelectionChanged"/>
-
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Racers" FontSize="32" FontWeight="Bold" Foreground="#20232A"/>
+                    <TextBlock Text="Manage registered racers or double-click a racer to view history." FontSize="15" Foreground="#777777" Margin="0,5,0,0"/>
                 </StackPanel>
 
-                <Button Grid.Column="1"
-                        Content="+ ADD RACER"
-                        Width="150"
-                        Height="45"
-                        VerticalAlignment="Center"
-                        FontWeight="Bold"
+                <Button Grid.Column="1" Content="+ ADD RACER" Width="140" Height="45"
+                        Background="#20232A" Foreground="White" FontSize="14" FontWeight="Bold"
                         Click="AddRacerButton_Click"/>
-
             </Grid>
 
-        </Border>
+            <!-- Search and Filter Bar -->
+            <Grid Margin="0,0,0,15">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-        <Grid Grid.Row="2"
-              Margin="40,0,40,40">
+                <TextBox x:Name="SearchTextBox" Width="260" Height="38" HorizontalAlignment="Left"
+                         Padding="10,8" FontSize="14"
+                         TextChanged="SearchTextBox_TextChanged"/>
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+                <!-- Category Tabs -->
+                <ListBox x:Name="CategoryTabs" Grid.Column="1" HorizontalAlignment="Left" Margin="20,0,0,0"
+                         SelectionChanged="CategoryTabs_SelectionChanged" BorderThickness="0" Background="Transparent">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="14,8"/>
+                            <Setter Property="Margin" Value="0,0,8,0"/>
+                            <Setter Property="Background" Value="#E2E8F0"/>
+                            <Setter Property="Foreground" Value="#20232A"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="FontSize" Value="14"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="Border" CornerRadius="6" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Border" Property="Background" Value="#20232A"/>
+                                                <Setter Property="Foreground" Value="White"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+            </Grid>
 
-            <Border Grid.Row="0"
-                    Background="White"
-                    CornerRadius="8"
-                    Padding="15">
+            <!-- Racers DataGrid -->
+            <DataGrid x:Name="RacersDataGrid"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      GridLinesVisibility="Horizontal"
+                      HeadersVisibility="Column"
+                      Background="White"
+                      BorderThickness="1"
+                      BorderBrush="#E0E0E0"
+                      RowHeight="45"
+                      FontSize="15"
+                      MouseDoubleClick="RacersDataGrid_MouseDoubleClick">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Racer ID" Binding="{Binding RacerId}" Width="120"/>
+                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+                    <DataGridTextColumn Header="Category / YOB" Binding="{Binding CategoryDisplay}" Width="160"/>
+                </DataGrid.Columns>
+            </DataGrid>
 
-                <Grid>
-
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1.2*"/>
-                        <ColumnDefinition Width="2.5*"/>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock Text="ID"
-                               FontWeight="Bold"
-                               Foreground="#777777"/>
-
-                    <TextBlock Grid.Column="1"
-                               Text="NAME"
-                               FontWeight="Bold"
-                               Foreground="#777777"/>
-
-                    <TextBlock Grid.Column="2"
-                               Text="YEAR"
-                               FontWeight="Bold"
-                               Foreground="#777777"/>
-
-                    <TextBlock Grid.Column="3"
-                               Text="CATEGORY"
-                               FontWeight="Bold"
-                               Foreground="#777777"/>
-
-                    <TextBlock Grid.Column="4"
-                               Text="STATUS"
-                               FontWeight="Bold"
-                               Foreground="#777777"/>
-
-                </Grid>
-
-            </Border>
-
-            <ScrollViewer Grid.Row="1"
-                          VerticalScrollBarVisibility="Auto"
-                          Margin="0,10,0,0">
-
-                <StackPanel x:Name="RacersPanel"/>
-
-            </ScrollViewer>
-
-        </Grid>
-
+        </StackPanel>
     </Grid>
-
 </UserControl>

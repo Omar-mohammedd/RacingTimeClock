@@ -1,30 +1,15 @@
-using System.Windows;
-using RacingTimeClock.Services;
+﻿using System.Windows;
+using RacingTimeClock.Data;
 
 namespace RacingTimeClock;
 
 public partial class App : Application
 {
-    protected override async void OnStartup(
-        StartupEventArgs e)
+    protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
 
-        try
-        {
-            DatabaseService databaseService = new();
-
-            await databaseService.InitializeAsync();
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show(
-                $"Database initialization failed.\n\n{ex.Message}",
-                "Database Error",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
-
-            Shutdown();
-        }
+        using var db = new RacingTimeClockDbContext();
+        db.Database.EnsureCreated();
     }
 }

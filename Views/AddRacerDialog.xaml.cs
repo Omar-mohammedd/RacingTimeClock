@@ -1,96 +1,62 @@
 ﻿using System;
 using System.Windows;
+using RacingTimeClock.Data;
 using RacingTimeClock.Models;
 
 namespace RacingTimeClock.Views;
 
 public partial class AddRacerDialog : Window
 {
-    public Racer CreatedRacer { get; private set; } = new();
-
     public AddRacerDialog()
     {
         InitializeComponent();
-
-        RacerIdTextBox.Focus();
     }
 
-    private void AddButton_Click(
-        object sender,
-        RoutedEventArgs e)
+    private async void AddButton_Click(object sender, RoutedEventArgs e)
     {
-        ErrorText.Text = string.Empty;
-
-        string racerId =
-            RacerIdTextBox.Text.Trim();
-
-        string name =
-            NameTextBox.Text.Trim();
-
-        string yearText =
-            YearOfBirthTextBox.Text.Trim();
-
-        if (string.IsNullOrWhiteSpace(racerId))
-        {
-            ErrorText.Text =
-                "Please enter a racer ID.";
-
-            RacerIdTextBox.Focus();
-
-            return;
-        }
+        string name = NameTextBox.Text.Trim();
+        string racerIdInput = RacerIdTextBox.Text.Trim();
+        string yobInput = YobTextBox.Text.Trim();
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            ErrorText.Text =
-                "Please enter the racer's name.";
-
-            NameTextBox.Focus();
-
+            MessageBox.Show("Please enter a racer name.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
-        if (!int.TryParse(
-                yearText,
-                out int yearOfBirth))
+        if (!int.TryParse(yobInput, out int yob) || yob < 1900 || yob > DateTime.Now.Year)
         {
-            ErrorText.Text =
-                "Year of birth must be a number.";
-
-            YearOfBirthTextBox.Focus();
-
+            MessageBox.Show("Please enter a valid Year of Birth (e.g., 2010).", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
-        int currentYear =
-            DateTime.Now.Year;
-
-        if (yearOfBirth < 1900 ||
-            yearOfBirth > currentYear)
+        try
         {
-            ErrorText.Text =
-                "Please enter a valid year of birth.";
+            using RacingTimeClockDbContext db = new();
 
-            YearOfBirthTextBox.Focus();
+            Racer racer = new Racer
+            {
+                RacerId = racerIdInput,
+                Name = name,
+                YearOfBirth = yob,
+                IsActive = true
+            };
 
-            return;
+            db.Racers.Add(racer);
+            await db.SaveChangesAsync();
+
+            DialogResult = true;
+            Close();
         }
-
-        CreatedRacer = new Racer
+        catch (Exception ex)
         {
-            RacerId = racerId,
-            Name = name,
-            YearOfBirth = yearOfBirth,
-            IsActive = true
-        };
-
-        DialogResult = true;
+            MessageBox.Show($"Failed to save racer to database.\n\n{ex.Message}", "Database Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
-    private void CancelButton_Click(
-        object sender,
-        RoutedEventArgs e)
+    private void CancelButton_Click(object sender, RoutedEventArgs e)
     {
         DialogResult = false;
+        Close();
     }
 }

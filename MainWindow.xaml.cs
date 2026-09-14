@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Windows;
 using RacingTimeClock.Views;
 
 namespace RacingTimeClock;
@@ -24,10 +25,11 @@ public partial class MainWindow : Window
     private void OnRaceStarted(
         string distance,
         string raceType,
-        int racerCount)
+        int racerCount,
+        List<NewRaceView.RacerSelectionItem> racers)
     {
         PageContent.Content =
-            new RaceView(distance, raceType, racerCount);
+            new RaceView(distance, raceType, racerCount, racers);
     }
 
     private void NewRace_Click(

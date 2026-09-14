@@ -1,0 +1,78 @@
+﻿<Window x:Class="RacingTimeClock.Views.RacerDetailsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Racer Details" Height="600" Width="700"
+        WindowStartupLocation="CenterOwner" Background="#F5F6F8">
+    <Grid Margin="25">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock x:Name="RacerNameText" FontSize="26" FontWeight="Bold" Foreground="#20232A"/>
+            <TextBlock x:Name="RacerInfoText" FontSize="14" Foreground="#777777" Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- Stats Overview Card -->
+        <Border Grid.Row="1" Background="White" CornerRadius="8" Padding="15" Margin="0,0,0,20">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Total Races" FontSize="12" Foreground="#888888"/>
+                    <TextBlock x:Name="TotalRacesText" FontSize="20" FontWeight="Bold" Foreground="#20232A" Margin="0,4,0,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="Victories (1st Place)" FontSize="12" Foreground="#888888"/>
+                    <TextBlock x:Name="WinsText" FontSize="20" FontWeight="Bold" Foreground="#007846" Margin="0,4,0,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="Podiums (Top 3)" FontSize="12" Foreground="#888888"/>
+                    <TextBlock x:Name="PodiumsText" FontSize="20" FontWeight="Bold" Foreground="#0064B4" Margin="0,4,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Race History DataGrid -->
+        <Grid Grid.Row="2">
+            <DataGrid x:Name="HistoryDataGrid"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      GridLinesVisibility="Horizontal"
+                      HeadersVisibility="Column"
+                      Background="White"
+                      BorderThickness="1"
+                      BorderBrush="#E0E0E0"
+                      RowHeight="40"
+                      FontSize="14">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Date &amp; Time" Binding="{Binding StartDateTime, StringFormat={}{0:yyyy-MM-dd HH:mm}}" Width="150"/>
+                    <DataGridTextColumn Header="Type" Binding="{Binding RaceType}" Width="80"/>
+                    <DataGridTextColumn Header="Distance" Binding="{Binding Distance}" Width="90"/>
+                    <DataGridTextColumn Header="Position" Binding="{Binding PositionDisplay}" Width="90"/>
+                    <DataGridTextColumn Header="Finish Time" Binding="{Binding FormattedFinishTime}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <!-- Action Buttons -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button x:Name="DeleteButton" Content="DELETE RACER" Width="130" Height="40"
+                    Background="#D9534F" Foreground="White" FontWeight="Bold"
+                    Margin="0,0,10,0" Click="DeleteButton_Click"/>
+            <Button Content="CLOSE" Width="100" Height="40"
+                    Background="#20232A" Foreground="White" FontWeight="Bold"
+                    Click="CloseButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

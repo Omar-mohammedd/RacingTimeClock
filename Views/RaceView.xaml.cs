@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,6 +15,7 @@ public partial class RaceView : UserControl
     private readonly string raceDistance;
     private readonly string raceType;
     private readonly int racerCount;
+    private readonly List<NewRaceView.RacerSelectionItem> selectedRacers;
 
     private readonly TimingService timingService = new();
     private readonly DatabaseService databaseService = new();
@@ -28,17 +29,18 @@ public partial class RaceView : UserControl
     public RaceView(
         string distance,
         string type,
-        int numberOfRacers)
+        int numberOfRacers,
+        List<NewRaceView.RacerSelectionItem> racers)
     {
         InitializeComponent();
 
         raceDistance = distance;
         raceType = type;
         racerCount = numberOfRacers;
+        selectedRacers = racers;
 
         RaceTitleText.Text = $"{raceDistance} Race";
-        RaceInfoText.Text =
-            $"{raceType} � {racerCount} Racers";
+        RaceInfoText.Text = $"{raceType} • {racerCount} Racers";
 
         for (int i = 0; i < racerCount; i++)
         {
@@ -50,9 +52,7 @@ public partial class RaceView : UserControl
         Loaded += RaceView_Loaded;
     }
 
-    private void RaceView_Loaded(
-        object sender,
-        RoutedEventArgs e)
+    private void RaceView_Loaded(object sender, RoutedEventArgs e)
     {
         Focus();
     }
@@ -73,37 +73,19 @@ public partial class RaceView : UserControl
             };
 
             Grid grid = new Grid();
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(200) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(180) });
 
-            grid.ColumnDefinitions.Add(
-                new ColumnDefinition
-                {
-                    Width = new GridLength(100)
-                });
-
-            grid.ColumnDefinitions.Add(
-                new ColumnDefinition
-                {
-                    Width = new GridLength(
-                        1,
-                        GridUnitType.Star)
-                });
-
-            grid.ColumnDefinitions.Add(
-                new ColumnDefinition
-                {
-                    Width = new GridLength(180)
-                });
+            string displayName = selectedRacers[i - 1].DisplayName;
 
             TextBlock racerNumber = new TextBlock
             {
-                Text = $"Racer {i}",
-                FontSize = 20,
+                Text = $"#{i}  {displayName}",
+                FontSize = 18,
                 FontWeight = FontWeights.Bold,
-                Foreground =
-                    new SolidColorBrush(
-                        Color.FromRgb(32, 35, 42))
+                Foreground = new SolidColorBrush(Color.FromRgb(32, 35, 42))
             };
-
             Grid.SetColumn(racerNumber, 0);
 
             TextBlock status = new TextBlock
@@ -113,7 +95,6 @@ public partial class RaceView : UserControl
                 FontWeight = FontWeights.SemiBold,
                 Foreground = Brushes.Gray
             };
-
             Grid.SetColumn(status, 1);
 
             TextBlock finishTime = new TextBlock
@@ -121,10 +102,8 @@ public partial class RaceView : UserControl
                 Text = "--",
                 FontSize = 18,
                 FontWeight = FontWeights.Bold,
-                HorizontalAlignment =
-                    HorizontalAlignment.Right
+                HorizontalAlignment = HorizontalAlignment.Right
             };
-
             Grid.SetColumn(finishTime, 2);
 
             grid.Children.Add(racerNumber);
@@ -132,13 +111,11 @@ public partial class RaceView : UserControl
             grid.Children.Add(finishTime);
 
             row.Child = grid;
-
             RacersPanel.Children.Add(row);
         }
     }
 
-    protected override void OnKeyDown(
-        KeyEventArgs e)
+    protected override void OnKeyDown(KeyEventArgs e)
     {
         base.OnKeyDown(e);
 
@@ -148,20 +125,15 @@ public partial class RaceView : UserControl
         if (e.Key == Key.Space)
         {
             StartRace();
-
             e.Handled = true;
-
             return;
         }
 
-        int racerNumber =
-            GetRacerNumber(e.Key);
+        int racerNumber = GetRacerNumber(e.Key);
 
-        if (racerNumber >= 1 &&
-            racerNumber <= racerCount)
+        if (racerNumber >= 1 && racerNumber <= racerCount)
         {
             FinishRacer(racerNumber);
-
             e.Handled = true;
         }
     }
@@ -189,37 +161,27 @@ public partial class RaceView : UserControl
             return;
 
         timingService.Start();
-
         raceStarted = true;
 
         StatusText.Text = "RACE RUNNING";
-
-        StatusText.Foreground =
-            new SolidColorBrush(
-                Color.FromRgb(0, 120, 70));
+        StatusText.Foreground = new SolidColorBrush(Color.FromRgb(0, 120, 70));
 
         StartTimerDisplay();
     }
 
     private async void StartTimerDisplay()
     {
-        while (raceStarted &&
-               !raceCompleted)
+        while (raceStarted && !raceCompleted)
         {
             UpdateTimerDisplay();
-
-            await System.Threading.Tasks.Task
-                .Delay(10);
+            await System.Threading.Tasks.Task.Delay(10);
         }
     }
 
     private void UpdateTimerDisplay()
     {
-        TimeSpan elapsed =
-            timingService.GetElapsedTime();
-
-        TimerText.Text =
-            FormatTime(elapsed);
+        TimeSpan elapsed = timingService.GetElapsedTime();
+        TimerText.Text = FormatTime(elapsed);
     }
 
     private void FinishRacer(int racerNumber)
@@ -232,34 +194,24 @@ public partial class RaceView : UserControl
         if (racerFinished[index])
             return;
 
-        TimeSpan? finishTime =
-            timingService.FinishRacer(
-                racerNumber);
+        TimeSpan? finishTime = timingService.FinishRacer(racerNumber);
 
         if (!finishTime.HasValue)
             return;
 
         racerFinished[index] = true;
 
-        if (RacersPanel.Children[index]
-            is Border row &&
-            row.Child is Grid grid)
+        if (RacersPanel.Children[index] is Border row && row.Child is Grid grid)
         {
-            if (grid.Children[1]
-                is TextBlock status)
+            if (grid.Children[1] is TextBlock status)
             {
                 status.Text = "FINISHED";
-
-                status.Foreground =
-                    new SolidColorBrush(
-                        Color.FromRgb(0, 120, 70));
+                status.Foreground = new SolidColorBrush(Color.FromRgb(0, 120, 70));
             }
 
-            if (grid.Children[2]
-                is TextBlock time)
+            if (grid.Children[2] is TextBlock time)
             {
-                time.Text =
-                    FormatTime(finishTime.Value);
+                time.Text = FormatTime(finishTime.Value);
             }
         }
 
@@ -268,11 +220,8 @@ public partial class RaceView : UserControl
 
     private void CheckRaceComplete()
     {
-        if (!timingService
-            .AllRacersFinished(racerCount))
-        {
+        if (!timingService.AllRacersFinished(racerCount))
             return;
-        }
 
         timingService.Complete();
 
@@ -280,35 +229,22 @@ public partial class RaceView : UserControl
         raceStarted = false;
 
         StatusText.Text = "RACE COMPLETE";
+        StatusText.Foreground = new SolidColorBrush(Color.FromRgb(0, 100, 180));
 
-        StatusText.Foreground =
-            new SolidColorBrush(
-                Color.FromRgb(0, 100, 180));
-
-        SaveRaceButton.Visibility =
-            Visibility.Visible;
-
+        SaveRaceButton.Visibility = Visibility.Visible;
         UpdateTimerDisplay();
     }
 
-    private async void SaveRaceButton_Click(
-        object sender,
-        RoutedEventArgs e)
+    private async void SaveRaceButton_Click(object sender, RoutedEventArgs e)
     {
         if (!raceCompleted || raceSaved)
             return;
 
-        Season? activeSeason =
-            await databaseService.GetActiveSeasonAsync();
+        Season? activeSeason = await databaseService.GetActiveSeasonAsync();
 
         if (activeSeason == null)
         {
-            MessageBox.Show(
-                "No active season exists.",
-                "Save Error",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
-
+            MessageBox.Show("No active season exists.", "Save Error", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
 
@@ -316,8 +252,7 @@ public partial class RaceView : UserControl
         {
             Distance = raceDistance,
             RaceType = raceType,
-            StartDateTime =
-                timingService.StartDateTime,
+            StartDateTime = timingService.StartDateTime,
             RacerCount = racerCount,
             IsCompleted = true,
             SeasonId = activeSeason.Id
@@ -325,67 +260,45 @@ public partial class RaceView : UserControl
 
         int position = 1;
 
-        foreach (var result in
-                 timingService.GetResults())
+        foreach (var result in timingService.GetResults())
         {
             int racerNumber = result.Key;
+            TimeSpan finishTime = result.Value;
+            long finishTimestamp = timingService.GetFinishTimestamp(racerNumber) ?? 0;
 
-            TimeSpan finishTime =
-                result.Value;
+            int? racerDatabaseId = selectedRacers[racerNumber - 1].Racer?.Id;
 
-            long finishTimestamp =
-                timingService
-                    .GetFinishTimestamp(
-                        racerNumber)
-                ?? 0;
-
-            race.Results.Add(
-                new RacerResult
-                {
-                    RacerNumber = racerNumber,
-                    Position = position,
-                    FinishTime = finishTime,
-                    FinishTimestamp =
-                        finishTimestamp
-                });
+            race.Results.Add(new RacerResult
+            {
+                RacerNumber = racerNumber,
+                RacerId = racerDatabaseId,
+                Position = position,
+                FinishTime = finishTime,
+                FinishTimestamp = finishTimestamp
+            });
 
             position++;
         }
 
         try
         {
-            await databaseService
-                .SaveRaceAsync(race);
+            await databaseService.SaveRaceAsync(race);
 
             raceSaved = true;
-
-            SaveRaceButton.Content =
-                "RACE SAVED";
-
+            SaveRaceButton.Content = "RACE SAVED";
             SaveRaceButton.IsEnabled = false;
 
             StatusText.Text = "RACE SAVED";
-
-            StatusText.Foreground =
-                new SolidColorBrush(
-                    Color.FromRgb(0, 120, 70));
+            StatusText.Foreground = new SolidColorBrush(Color.FromRgb(0, 120, 70));
         }
         catch (Exception ex)
         {
-            MessageBox.Show(
-                ex.ToString(),
-                "Save Error",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
+            MessageBox.Show(ex.ToString(), "Save Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
     private string FormatTime(TimeSpan time)
     {
-        return
-            $"{(int)time.TotalMinutes:00}:" +
-            $"{time.Seconds:00}." +
-            $"{time.Milliseconds:000}";
+        return $"{(int)time.TotalMinutes:00}:{time.Seconds:00}.{time.Milliseconds:000}";
     }
 }
-

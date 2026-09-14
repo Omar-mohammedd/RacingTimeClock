@@ -1,0 +1,38 @@
+﻿<UserControl x:Class="RacingTimeClock.Views.RacesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Background="#F5F6F8">
+        <StackPanel Margin="45">
+
+            <!-- Page Header -->
+            <StackPanel Margin="0,0,0,25">
+                <TextBlock Text="Races Log" FontSize="32" FontWeight="Bold" Foreground="#20232A"/>
+                <TextBlock Text="Double-click any race log entry to view full detailed leaderboards." FontSize="15" Foreground="#777777" Margin="0,5,0,0"/>
+            </StackPanel>
+
+            <!-- Races DataGrid -->
+            <DataGrid x:Name="RacesDataGrid"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      GridLinesVisibility="Horizontal"
+                      HeadersVisibility="Column"
+                      Background="White"
+                      BorderThickness="1"
+                      BorderBrush="#E0E0E0"
+                      RowHeight="45"
+                      FontSize="15"
+                      MouseDoubleClick="RacesDataGrid_MouseDoubleClick">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Date &amp; Time" Binding="{Binding FormattedDate}" Width="160"/>
+                    <DataGridTextColumn Header="Race Type" Binding="{Binding RaceType}" Width="110"/>
+                    <DataGridTextColumn Header="Distance" Binding="{Binding Distance}" Width="110"/>
+                    <DataGridTextColumn Header="Winner Name" Binding="{Binding WinnerName}" Width="*"/>
+                    <DataGridTextColumn Header="Winning Time" Binding="{Binding FormattedWinnerTime}" Width="160"/>
+                    <DataGridTextColumn Header="Total Racers" Binding="{Binding TotalRacers}" Width="110"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -36,7 +36,13 @@
                     <TextBlock Text="TIME CLOCK"
                                Foreground="#AAAAAA"
                                FontSize="16"
-                               Margin="25,0,25,40"/>
+                               Margin="25,0,25,5"/>
+
+                    <TextBlock x:Name="SeasonLabel"
+                               Text="Season"
+                               Foreground="#AAAAAA"
+                               FontSize="13"
+                               Margin="25,0,25,30"/>
 
                     <Button Content="🏁  New Race"
                             Height="55"

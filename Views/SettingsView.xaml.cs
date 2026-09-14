@@ -37,30 +37,36 @@ public partial class SettingsView : UserControl
             DatabaseService databaseService =
                 new DatabaseService();
 
+            int automaticStartYear =
+                SeasonService.GetAutomaticSeasonStartYear(
+                    DateTime.Now);
+
             seasons =
-                await databaseService.GetSeasonsAsync();
+                (await databaseService.GetSeasonsAsync())
+                .Where(s =>
+                    s.StartYear >= automaticStartYear - 5 &&
+                    s.StartYear <= automaticStartYear + 5)
+                .OrderBy(s => s.StartYear)
+                .ToList();
 
-            SeasonComboBox.ItemsSource =
-                seasons;
+            SeasonComboBox.Items.Clear();
 
-            SeasonComboBox.DisplayMemberPath =
-                "Name";
-
-            Season? currentSeason =
+            Season? detectedSeason =
                 AppSeasonService.Instance.CurrentSeason;
 
-            if (currentSeason != null)
-            {
-                Season? matchingSeason =
-                    seasons.FirstOrDefault(
-                        s => s.Id == currentSeason.Id);
+            string autoText =
+                detectedSeason != null
+                    ? $"Auto ({detectedSeason.Name})"
+                    : "Auto";
 
-                if (matchingSeason != null)
-                {
-                    SeasonComboBox.SelectedItem =
-                        matchingSeason;
-                }
+            SeasonComboBox.Items.Add(autoText);
+
+            foreach (Season season in seasons)
+            {
+                SeasonComboBox.Items.Add(season.Name);
             }
+
+            SeasonComboBox.SelectedIndex = 0;
 
             UpdateSeasonInfo();
         }
@@ -85,16 +91,36 @@ public partial class SettingsView : UserControl
         if (loading)
             return;
 
-        if (SeasonComboBox.SelectedItem
-            is not Season season)
+        if (SeasonComboBox.SelectedIndex == 0)
         {
+            Season? detectedSeason =
+                AppSeasonService.Instance.CurrentSeason;
+
+            if (detectedSeason != null)
+            {
+                AppSeasonService.Instance
+                    .SetAutomaticSeason(detectedSeason);
+            }
+
+            UpdateSeasonInfo();
+
             return;
         }
 
-        AppSeasonService.Instance
-            .SetSeason(season);
+        if (SeasonComboBox.SelectedItem is string seasonName)
+        {
+            Season? season =
+                seasons.FirstOrDefault(
+                    s => s.Name == seasonName);
 
-        UpdateSeasonInfo();
+            if (season != null)
+            {
+                AppSeasonService.Instance
+                    .SetSeason(season);
+            }
+
+            UpdateSeasonInfo();
+        }
     }
 
     private void UpdateSeasonInfo()
@@ -113,18 +139,18 @@ public partial class SettingsView : UserControl
         int seniorCutoff =
             season.StartYear - 18;
 
-        int youthStart =
+        int juniorMinimum =
+            season.StartYear - 17;
+
+        int juniorMaximum =
             season.StartYear - 14;
 
-        int juniorStart =
-            seniorCutoff + 1;
-
-        int juniorEnd =
-            youthStart - 1;
+        int youthStart =
+            season.StartYear - 13;
 
         SeasonInfoText.Text =
             $"Senior: {seniorCutoff} and older\n" +
-            $"Junior: {juniorStart}-{juniorEnd}\n" +
+            $"Junior: {juniorMinimum}-{juniorMaximum}\n" +
             $"Youth: {youthStart} and younger";
     }
 }

@@ -117,30 +117,16 @@ public partial class NewRaceView : UserControl
         if (season == null)
             return false;
 
-        int seniorMaximumBirthYear =
-            season.StartYear - 18;
-
-        int juniorMinimumBirthYear =
-            season.StartYear - 17;
-
-        int juniorMaximumBirthYear =
-            season.StartYear - 15;
-
-        int youthMinimumBirthYear =
-            season.StartYear - 14;
+        string category =
+            SeasonService.GetCategory(
+                racer,
+                season);
 
         return selectedCategory switch
         {
-            "Seniors" =>
-                racer.YearOfBirth <= seniorMaximumBirthYear,
-
-            "Juniors" =>
-                racer.YearOfBirth >= juniorMinimumBirthYear &&
-                racer.YearOfBirth <= juniorMaximumBirthYear,
-
-            "Youth" =>
-                racer.YearOfBirth >= youthMinimumBirthYear,
-
+            "Seniors" => category == "Senior",
+            "Juniors" => category == "Junior",
+            "Youth" => category == "Youth",
             _ => true
         };
     }
@@ -216,7 +202,7 @@ public partial class NewRaceView : UserControl
                     {
                         Racer = racer,
                         DisplayName =
-                            $"{racer.Name} ({racer.RacerId})"
+                            $"{racer.Name} | {racer.RacingNumber}"
                     });
             }
 
@@ -537,3 +523,5 @@ public partial class NewRaceView : UserControl
             selections);
     }
 }
+
+

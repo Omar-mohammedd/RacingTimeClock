@@ -1,38 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Microsoft.EntityFrameworkCore;
 using RacingTimeClock.Data;
 using RacingTimeClock.Models;
+using RacingTimeClock.Services;
 
 namespace RacingTimeClock.Views;
 
 public partial class RacersView : UserControl
 {
-    public class RacerDisplayItem
-    {
-        public Racer Racer { get; set; } = null!;
-        public int Id => Racer.Id;
-        public string RacerId => Racer.RacerId?.ToString() ?? string.Empty;
-        public string Name => Racer.Name;
-        public string CategoryDisplay { get; set; } = string.Empty;
-        public int? BirthYear { get; set; }
-        public bool IsSenior { get; set; }
-    }
-
-    private List<RacerDisplayItem> displayRacers = new();
+    private readonly ObservableCollection<RacerDisplayItem> allRacers = new();
 
     public RacersView()
     {
         InitializeComponent();
+
+        CategoryTabs.Items.Add("All");
+        CategoryTabs.Items.Add("Seniors");
+        CategoryTabs.Items.Add("Juniors");
+        CategoryTabs.Items.Add("Youth");
+
+        CategoryTabs.SelectedIndex = 0;
+
         Loaded += RacersView_Loaded;
     }
 
-    private async void RacersView_Loaded(object sender, RoutedEventArgs e)
+    private async void RacersView_Loaded(
+        object sender,
+        RoutedEventArgs e)
     {
         await LoadRacersAsync();
     }
@@ -42,128 +38,169 @@ public partial class RacersView : UserControl
         try
         {
             using RacingTimeClockDbContext db = new();
-            var rawRacers = await db.Racers
-                .Where(r => r.IsActive)
-                .OrderBy(r => r.Name)
-                .ToListAsync();
 
-            int currentYear = DateTime.Now.Year;
+            List<Racer> racers =
+                await Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions
+                    .ToListAsync(db.Racers);
 
-            displayRacers = rawRacers.Select(r =>
+            Season? season =
+                AppSeasonService.Instance.CurrentSeason;
+
+            if (season == null)
             {
-                int? yob = r.YearOfBirth > 0 ? r.YearOfBirth : null;
+                RacersDataGrid.ItemsSource = null;
+                return;
+            }
 
-                bool isSenior = yob.HasValue ? (currentYear - yob.Value >= 18) : true;
-                string categoryStr = isSenior ? "Seniors" : (yob.HasValue ? yob.Value.ToString() : "Seniors");
+            allRacers.Clear();
 
-                return new RacerDisplayItem
-                {
-                    Racer = r,
-                    BirthYear = yob,
-                    IsSenior = isSenior,
-                    CategoryDisplay = categoryStr
-                };
-            }).ToList();
+            foreach (Racer racer in racers)
+            {
+                allRacers.Add(
+                    new RacerDisplayItem
+                    {
+                        Racer = racer,
+                        BirthYear = racer.YearOfBirth,
+                        CategoryDisplay =
+                            SeasonService.GetCategory(
+                                racer,
+                                season)
+                    });
+            }
 
-            PopulateCategoryTabs();
-            ApplyFilter();
+            ApplyFilters();
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Could not load racers.\n\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(
+                $"Failed to load racers.\n\n{ex}",
+                "Database Error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
         }
     }
 
-    private void PopulateCategoryTabs()
+    private void ApplyFilters()
     {
-        CategoryTabs.SelectionChanged -= CategoryTabs_SelectionChanged;
+        string search =
+            SearchTextBox.Text.Trim();
 
-        CategoryTabs.Items.Clear();
-        CategoryTabs.Items.Add("All");
+        string selectedCategory =
+            CategoryTabs.SelectedItem?.ToString() ?? "All";
 
-        var juniorYears = displayRacers
-            .Where(r => !r.IsSenior && r.BirthYear.HasValue)
-            .Select(r => r.BirthYear!.Value.ToString())
-            .Distinct()
-            .OrderByDescending(y => y);
+        IEnumerable<RacerDisplayItem> filtered =
+            allRacers;
 
-        foreach (var year in juniorYears)
+        if (!string.IsNullOrWhiteSpace(search))
         {
-            CategoryTabs.Items.Add(year);
+            filtered = filtered.Where(
+                r => r.Name.Contains(
+                         search,
+                         StringComparison.OrdinalIgnoreCase)
+                     || r.RacingNumber.Contains(
+                         search,
+                         StringComparison.OrdinalIgnoreCase));
         }
 
-        CategoryTabs.Items.Add("Seniors");
-        CategoryTabs.SelectedIndex = 0;
-
-        CategoryTabs.SelectionChanged += CategoryTabs_SelectionChanged;
-    }
-
-    private void ApplyFilter()
-    {
-        string query = SearchTextBox.Text.Trim().ToLower();
-        string selectedTab = CategoryTabs.SelectedItem as string ?? "All";
-
-        var filtered = displayRacers.AsEnumerable();
-
-        if (selectedTab != "All")
+        if (selectedCategory != "All")
         {
-            if (selectedTab == "Seniors")
-            {
-                filtered = filtered.Where(r => r.IsSenior);
-            }
-            else
-            {
-                filtered = filtered.Where(r => !r.IsSenior && r.BirthYear.HasValue && r.BirthYear.Value.ToString() == selectedTab);
-            }
+            string category =
+                selectedCategory.TrimEnd('s');
+
+            filtered = filtered.Where(
+                r => r.CategoryDisplay == category);
         }
 
-        if (!string.IsNullOrWhiteSpace(query))
-        {
-            filtered = filtered.Where(r => r.Name.ToLower().Contains(query) ||
-                                           r.RacerId.ToLower().Contains(query));
-        }
-
-        RacersDataGrid.ItemsSource = filtered.ToList();
+        RacersDataGrid.ItemsSource =
+            filtered.ToList();
     }
 
-    private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    private void SearchTextBox_TextChanged(
+        object sender,
+        TextChangedEventArgs e)
     {
-        ApplyFilter();
+        SearchPlaceholder.Visibility =
+            string.IsNullOrEmpty(SearchTextBox.Text)
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+
+        ApplyFilters();
     }
 
-    private void CategoryTabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void CategoryTabs_SelectionChanged(
+        object sender,
+        SelectionChangedEventArgs e)
     {
-        ApplyFilter();
+        if (!IsLoaded)
+            return;
+
+        ApplyFilters();
     }
 
-    private async void AddRacerButton_Click(object sender, RoutedEventArgs e)
+    private void AddRacerButton_Click(
+        object sender,
+        RoutedEventArgs e)
     {
-        AddRacerDialog dialog = new AddRacerDialog
-        {
-            Owner = Window.GetWindow(this)
-        };
-
-        if (dialog.ShowDialog() == true)
-        {
-            await LoadRacersAsync();
-        }
-    }
-
-    private async void RacersDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-    {
-        if (RacersDataGrid.SelectedItem is RacerDisplayItem selectedItem)
-        {
-            RacerDetailsDialog dialog = new RacerDetailsDialog(selectedItem.Id)
+        AddRacerDialog dialog =
+            new AddRacerDialog
             {
                 Owner = Window.GetWindow(this)
             };
 
-            dialog.ShowDialog();
+        bool? result = dialog.ShowDialog();
 
-            if (dialog.WasDeleted)
-            {
-                await LoadRacersAsync();
-            }
-        }
+        if (result == true)
+            _ = LoadRacersAsync();
+    }
+
+    private void RacersDataGrid_MouseDoubleClick(
+        object sender,
+        MouseButtonEventArgs e)
+    {
+        if (RacersDataGrid.SelectedItem
+            is not RacerDisplayItem item)
+            return;
+
+        MessageBox.Show(
+            $"Name: {item.Name}\n" +
+            $"Racing Number: {item.RacingNumber}\n" +
+            $"Gender: {item.GenderDisplay}\n" +
+            $"Year of Birth: {item.BirthYear}\n" +
+            $"Category: {item.CategoryDisplay}",
+            "Racer Details",
+            MessageBoxButton.OK,
+            MessageBoxImage.Information);
     }
 }
+
+public class RacerDisplayItem
+{
+    public Racer Racer { get; set; } = null!;
+
+    public int Id =>
+        Racer.Id;
+
+    public string Name =>
+        Racer.Name;
+
+    public string RacingNumber =>
+        Racer.RacingNumber;
+
+    public string GenderDisplay =>
+        Racer.IsMale ? "Male" : "Female";
+
+    public int BirthYear { get; set; }
+
+    public string CategoryDisplay { get; set; } =
+        string.Empty;
+}
+
+
+
+
+
+
+
+
+
+

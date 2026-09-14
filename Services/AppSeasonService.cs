@@ -12,11 +12,11 @@ public class AppSeasonService : INotifyPropertyChanged
         instance.Value;
 
     private Season? currentSeason;
+    private bool isAuto;
 
     public Season? CurrentSeason
     {
         get => currentSeason;
-
         private set
         {
             currentSeason = value;
@@ -25,11 +25,32 @@ public class AppSeasonService : INotifyPropertyChanged
                 this,
                 new PropertyChangedEventArgs(
                     nameof(CurrentSeason)));
+
+            PropertyChanged?.Invoke(
+                this,
+                new PropertyChangedEventArgs(
+                    nameof(CurrentSeasonDisplay)));
         }
     }
 
-    public event PropertyChangedEventHandler?
-        PropertyChanged;
+    public bool IsAuto
+    {
+        get => isAuto;
+        private set
+        {
+            isAuto = value;
+
+            PropertyChanged?.Invoke(
+                this,
+                new PropertyChangedEventArgs(
+                    nameof(IsAuto)));
+        }
+    }
+
+    public string CurrentSeasonDisplay =>
+        CurrentSeason?.Name ?? string.Empty;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     private AppSeasonService()
     {
@@ -37,6 +58,13 @@ public class AppSeasonService : INotifyPropertyChanged
 
     public void SetSeason(Season season)
     {
+        IsAuto = false;
+        CurrentSeason = season;
+    }
+
+    public void SetAutomaticSeason(Season season)
+    {
+        IsAuto = true;
         CurrentSeason = season;
     }
 

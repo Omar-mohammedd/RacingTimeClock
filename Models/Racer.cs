@@ -12,6 +12,8 @@ public class Racer
 
     public bool IsMale { get; set; }
 
+    public string RacingNumber { get; set; } = string.Empty;
+
     public bool IsActive { get; set; } = true;
 
     public List<RacerResult> Results { get; set; } = new();

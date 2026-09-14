@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using RacingTimeClock.Data;
 using RacingTimeClock.Models;
 
@@ -13,49 +13,29 @@ public class DatabaseService
 
         await db.Database.EnsureCreatedAsync();
 
-        await db.Database.ExecuteSqlRawAsync("""
-            PRAGMA foreign_keys = OFF;
+        await SeedSeasonsAsync(db);
+    }
 
-            ALTER TABLE RacerResults
-            RENAME TO RacerResults_Old;
+    private async Task SeedSeasonsAsync(
+        RacingTimeClockDbContext db)
+    {
+        List<Season> existingSeasons =
+            await db.Seasons.ToListAsync();
 
-            CREATE TABLE RacerResults (
-                Id INTEGER NOT NULL CONSTRAINT PK_RacerResults PRIMARY KEY AUTOINCREMENT,
-                RaceId INTEGER NOT NULL,
-                RacerId INTEGER NULL,
-                RacerNumber INTEGER NOT NULL,
-                Position INTEGER NOT NULL,
-                FinishTime INTEGER NOT NULL,
-                FinishTimestamp INTEGER NOT NULL,
-                CONSTRAINT FK_RacerResults_Races_RaceId
-                    FOREIGN KEY (RaceId) REFERENCES Races (Id) ON DELETE CASCADE,
-                CONSTRAINT FK_RacerResults_Racers_RacerId
-                    FOREIGN KEY (RacerId) REFERENCES Racers (Id) ON DELETE RESTRICT
-            );
-
-            INSERT INTO RacerResults
-                (Id, RaceId, RacerId, RacerNumber, Position, FinishTime, FinishTimestamp)
-            SELECT
-                Id, RaceId, RacerId, RacerNumber, Position, FinishTime, FinishTimestamp
-            FROM RacerResults_Old;
-
-            DROP TABLE RacerResults_Old;
-
-            PRAGMA foreign_keys = ON;
-        """);
-
-        if (!await db.Seasons.AnyAsync())
+        for (int year = 2020; year <= 2035; year++)
         {
-            db.Seasons.Add(
-                new Season
-                {
-                    Name = "2026 Season",
-                    SeniorMinimumBirthYear = 0,
-                    IsActive = true
-                });
+            bool exists =
+                existingSeasons.Any(
+                    s => s.StartYear == year);
 
-            await db.SaveChangesAsync();
+            if (exists)
+                continue;
+
+            db.Seasons.Add(
+                SeasonService.CreateSeason(year));
         }
+
+        await db.SaveChangesAsync();
     }
 
     public async Task SaveRaceAsync(Race race)
@@ -79,11 +59,14 @@ public class DatabaseService
 
         return await db.Races
             .Include(r => r.Results)
-            .OrderByDescending(r => r.StartDateTime)
+                .ThenInclude(r => r.Racer)
+            .Include(r => r.Season)
+            .OrderByDescending(
+                r => r.StartDateTime)
             .ToListAsync();
     }
 
-    public async Task<Season?> GetActiveSeasonAsync()
+    public async Task<List<Season>> GetSeasonsAsync()
     {
         using RacingTimeClockDbContext db =
             new RacingTimeClockDbContext();
@@ -91,7 +74,23 @@ public class DatabaseService
         await db.Database.EnsureCreatedAsync();
 
         return await db.Seasons
-            .FirstOrDefaultAsync(s => s.IsActive);
+            .Where(s => s.IsActive)
+            .OrderByDescending(
+                s => s.StartYear)
+            .ToListAsync();
+    }
+
+    public async Task<Season?> GetSeasonAsync(
+        int seasonId)
+    {
+        using RacingTimeClockDbContext db =
+            new RacingTimeClockDbContext();
+
+        await db.Database.EnsureCreatedAsync();
+
+        return await db.Seasons
+            .FirstOrDefaultAsync(
+                s => s.Id == seasonId &&
+                     s.IsActive);
     }
 }
-

@@ -6,7 +6,7 @@ public class Season
 
     public string Name { get; set; } = string.Empty;
 
-    public int SeniorMinimumBirthYear { get; set; }
+    public int StartYear { get; set; }
 
     public bool IsActive { get; set; } = true;
 }

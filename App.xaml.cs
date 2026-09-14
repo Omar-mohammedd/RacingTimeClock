@@ -1,15 +1,43 @@
 ﻿using System.Windows;
-using RacingTimeClock.Data;
+using RacingTimeClock.Services;
 
 namespace RacingTimeClock;
 
 public partial class App : Application
 {
-    protected override void OnStartup(StartupEventArgs e)
+    protected override async void OnStartup(
+        StartupEventArgs e)
     {
         base.OnStartup(e);
 
-        using var db = new RacingTimeClockDbContext();
-        db.Database.EnsureCreated();
+        try
+        {
+            DatabaseService databaseService =
+                new DatabaseService();
+
+            await databaseService.InitializeAsync();
+
+            List<Models.Season> seasons =
+                await databaseService.GetSeasonsAsync();
+
+            Models.Season detectedSeason =
+                SeasonService
+                    .GetAutomaticallyDetectedSeason(
+                        seasons,
+                        DateTime.Now);
+
+            AppSeasonService.Instance
+                .SetSeason(detectedSeason);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                $"Could not initialize the application.\n\n{ex}",
+                "Startup Error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+
+            Shutdown();
+        }
     }
 }

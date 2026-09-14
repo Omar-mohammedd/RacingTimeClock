@@ -91,36 +91,63 @@ public partial class RacerDetailsDialog : Window
         }
     }
 
-    private async void DeleteButton_Click(object sender, RoutedEventArgs e)
+    private async void DeleteButton_Click(
+    object sender,
+    RoutedEventArgs e)
+{
+    var result = MessageBox.Show(
+        "Are you sure you want to deactivate this racer?\n\n" +
+        "The racer will disappear from active racer lists, " +
+        "but all historical race results will remain محفوظ.",
+        "Confirm Deactivation",
+        MessageBoxButton.YesNo,
+        MessageBoxImage.Warning);
+
+    if (result != MessageBoxResult.Yes)
+        return;
+
+    try
     {
-        var result = MessageBox.Show(
-            "Are you sure you want to delete this racer? Historical race logs will keep performance statistics, but the racer record will be removed.",
-            "Confirm Delete",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Warning);
+        using RacingTimeClockDbContext db =
+            new RacingTimeClockDbContext();
 
-        if (result != MessageBoxResult.Yes)
+        Racer? racer =
+            await db.Racers.FindAsync(racerId);
+
+        if (racer == null)
+        {
+            MessageBox.Show(
+                "Racer not found.",
+                "Error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+
             return;
-
-        try
-        {
-            using RacingTimeClockDbContext db = new();
-            var racer = await db.Racers.FindAsync(racerId);
-
-            if (racer != null)
-            {
-                db.Racers.Remove(racer);
-                await db.SaveChangesAsync();
-                WasDeleted = true;
-                MessageBox.Show("Racer deleted successfully.", "Deleted", MessageBoxButton.OK, MessageBoxImage.Information);
-                Close();
-            }
         }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Could not delete racer.\n\n{ex.Message}", "Delete Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
+
+        racer.IsActive = false;
+
+        await db.SaveChangesAsync();
+
+        WasDeleted = true;
+
+        MessageBox.Show(
+            "Racer deactivated successfully.",
+            "Racer Deactivated",
+            MessageBoxButton.OK,
+            MessageBoxImage.Information);
+
+        Close();
     }
+    catch (Exception ex)
+    {
+        MessageBox.Show(
+            $"Could not deactivate racer.\n\n{ex}",
+            "Error",
+            MessageBoxButton.OK,
+            MessageBoxImage.Error);
+    }
+}
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)
     {

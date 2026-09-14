@@ -1,0 +1,59 @@
+﻿<UserControl x:Class="RacingTimeClock.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Background="#F5F6F8">
+
+        <StackPanel Margin="45">
+
+            <TextBlock Text="Settings"
+                       FontSize="32"
+                       FontWeight="Bold"
+                       Foreground="#20232A"/>
+
+            <TextBlock Text="Application settings and race configuration."
+                       FontSize="15"
+                       Foreground="#777777"
+                       Margin="0,5,0,35"/>
+
+            <Border Background="White"
+                    CornerRadius="8"
+                    Padding="25"
+                    Width="600"
+                    HorizontalAlignment="Left">
+
+                <StackPanel>
+
+                    <TextBlock Text="Current Season"
+                               FontSize="20"
+                               FontWeight="SemiBold"
+                               Foreground="#20232A"/>
+
+                    <TextBlock Text="The selected season controls racer categories throughout the application."
+                               FontSize="14"
+                               Foreground="#777777"
+                               TextWrapping="Wrap"
+                               Margin="0,5,0,15"/>
+
+                    <ComboBox x:Name="SeasonComboBox"
+                              Width="250"
+                              Height="40"
+                              HorizontalAlignment="Left"
+                              FontSize="15"
+                              SelectionChanged="SeasonComboBox_SelectionChanged"/>
+
+                    <TextBlock x:Name="SeasonInfoText"
+                               FontSize="14"
+                               Foreground="#777777"
+                               Margin="0,12,0,0"
+                               TextWrapping="Wrap"/>
+
+                </StackPanel>
+
+            </Border>
+
+        </StackPanel>
+
+    </Grid>
+
+</UserControl>

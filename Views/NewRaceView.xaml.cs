@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -106,7 +106,7 @@ public partial class NewRaceView : UserControl
                 Season defaultSeason = new Season
                 {
                     Name = "2026/27",
-                    SeniorMinimumBirthYear = 2008,
+                    StartYear = 2026,
                     IsActive = true
                 };
 
@@ -157,14 +157,30 @@ public partial class NewRaceView : UserControl
         if (season == null)
             return false;
 
-        bool isSenior =
-            racer.YearOfBirth <=
-            season.SeniorMinimumBirthYear;
+        int seniorMaximumBirthYear =
+            season.StartYear - 18;
+
+        int juniorMinimumBirthYear =
+            season.StartYear - 17;
+
+        int juniorMaximumBirthYear =
+            season.StartYear - 14;
+
+        int youthMinimumBirthYear =
+            season.StartYear - 13;
 
         return selectedCategory switch
         {
-            "Seniors" => isSenior,
-            "Juniors" => !isSenior,
+            "Seniors" =>
+                racer.YearOfBirth <= seniorMaximumBirthYear,
+
+            "Juniors" =>
+                racer.YearOfBirth >= juniorMinimumBirthYear &&
+                racer.YearOfBirth <= juniorMaximumBirthYear,
+
+            "Youth" =>
+                racer.YearOfBirth >= youthMinimumBirthYear,
+
             _ => true
         };
     }
@@ -549,3 +565,6 @@ public partial class NewRaceView : UserControl
             selections);
     }
 }
+
+
+

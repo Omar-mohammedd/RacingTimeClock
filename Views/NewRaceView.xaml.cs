@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Microsoft.EntityFrameworkCore;
@@ -64,10 +65,10 @@ public partial class NewRaceView : UserControl
         InitializeComponent();
 
         BuildDistanceButtons();
-        BuildRacerCountButtons();
+        UpdateRacerCountDisplay();
         UpdateRaceTypeButtons();
         UpdateDistanceButtons();
-        UpdateRacerCountButtons();
+        
         UpdateCategoryButtons();
 
         Loaded += NewRaceView_Loaded;
@@ -348,46 +349,37 @@ public partial class NewRaceView : UserControl
         }
     }
 
-    private void BuildRacerCountButtons()
+    private void UpdateRacerCountDisplay()
     {
-        RacerCountPanel.Children.Clear();
-
-        for (int i = 1; i <= 9; i++)
-        {
-            Button button = new Button
-            {
-                Content = i.ToString(),
-                Width = 55,
-                Height = 50,
-                Margin =
-                    new Thickness(0, 0, 10, 10),
-                FontSize = 16,
-                FontWeight =
-                    FontWeights.SemiBold,
-                Tag = i
-            };
-
-            button.Click +=
-                RacerCountButton_Click;
-
-            RacerCountPanel.Children.Add(button);
-        }
+        RacerCountText.Text =
+            selectedRacerCount.ToString();
     }
 
-    private void RacerCountButton_Click(
+    private void DecreaseRacerCountButton_Click(
         object sender,
-        RoutedEventArgs e)
+        MouseButtonEventArgs e)
     {
-        if (sender is Button button &&
-            button.Tag is int count)
-        {
-            selectedRacerCount = count;
+        if (selectedRacerCount <= 1)
+            return;
 
-            UpdateRacerCountButtons();
-            RebuildRacerSelectionUI();
-        }
+        selectedRacerCount--;
+
+        UpdateRacerCountDisplay();
+        RebuildRacerSelectionUI();
     }
 
+    private void IncreaseRacerCountButton_Click(
+        object sender,
+        MouseButtonEventArgs e)
+    {
+        if (selectedRacerCount >= 9)
+            return;
+
+        selectedRacerCount++;
+
+        UpdateRacerCountDisplay();
+        RebuildRacerSelectionUI();
+    }
     private void UpdateRaceTypeButtons()
     {
         SetButtonSelected(
@@ -409,20 +401,6 @@ public partial class NewRaceView : UserControl
                 SetButtonSelected(
                     button,
                     distance == selectedDistance);
-            }
-        }
-    }
-
-    private void UpdateRacerCountButtons()
-    {
-        foreach (Button button
-                 in RacerCountPanel.Children)
-        {
-            if (button.Tag is int count)
-            {
-                SetButtonSelected(
-                    button,
-                    count == selectedRacerCount);
             }
         }
     }
@@ -523,5 +501,13 @@ public partial class NewRaceView : UserControl
             selections);
     }
 }
+
+
+
+
+
+
+
+
 
 

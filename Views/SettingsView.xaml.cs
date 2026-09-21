@@ -25,7 +25,42 @@ public partial class SettingsView : UserControl
         object sender,
         RoutedEventArgs e)
     {
+        LoadTheme();
+
         await LoadSeasonsAsync();
+    }
+
+    private void LoadTheme()
+    {
+        loading = true;
+
+        ThemeComboBox.SelectedIndex =
+            ThemeService.CurrentMode switch
+            {
+                RacingTimeClock.Services.ThemeMode.Light => 0,
+                RacingTimeClock.Services.ThemeMode.Dark => 1,
+                _ => 2
+            };
+
+        loading = false;
+    }
+
+    private void ThemeComboBox_SelectionChanged(
+        object sender,
+        SelectionChangedEventArgs e)
+    {
+        if (loading)
+            return;
+
+        RacingTimeClock.Services.ThemeMode mode =
+            ThemeComboBox.SelectedIndex switch
+            {
+                0 => RacingTimeClock.Services.ThemeMode.Light,
+                1 => RacingTimeClock.Services.ThemeMode.Dark,
+                _ => RacingTimeClock.Services.ThemeMode.System
+            };
+
+        ThemeService.Apply(mode);
     }
 
     private async Task LoadSeasonsAsync()
@@ -154,3 +189,4 @@ public partial class SettingsView : UserControl
             $"Youth: {youthStart} and younger";
     }
 }
+

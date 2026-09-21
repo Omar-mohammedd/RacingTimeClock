@@ -10,6 +10,8 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
+        ThemeService.Initialize();
+
         try
         {
             DatabaseService databaseService =
@@ -41,5 +43,6 @@ public partial class App : Application
         }
     }
 }
+
 
 

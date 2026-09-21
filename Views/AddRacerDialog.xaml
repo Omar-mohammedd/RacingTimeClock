@@ -6,7 +6,7 @@
         Width="450"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
-        Background="#F5F6F8">
+        Background="{DynamicResource PageBackgroundBrush}">
 
     <Grid Margin="25">
 
@@ -20,7 +20,7 @@
                    Text="Add New Racer"
                    FontSize="22"
                    FontWeight="Bold"
-                   Foreground="#20232A"
+                   Foreground="{DynamicResource TextPrimaryBrush}"
                    Margin="0,0,0,15"/>
 
         <StackPanel Grid.Row="1">
@@ -28,7 +28,7 @@
             <TextBlock Text="Racer ID *"
                        FontSize="13"
                        FontWeight="SemiBold"
-                       Foreground="#555555"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
                        Margin="0,0,0,4"/>
 
             <TextBox x:Name="RacerIdTextBox"
@@ -41,7 +41,7 @@
             <TextBlock Text="Name *"
                        FontSize="13"
                        FontWeight="SemiBold"
-                       Foreground="#555555"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
                        Margin="0,0,0,4"/>
 
             <TextBox x:Name="NameTextBox"
@@ -54,19 +54,18 @@
             <TextBlock Text="Year of Birth *"
                        FontSize="13"
                        FontWeight="SemiBold"
-                       Foreground="#555555"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
                        Margin="0,0,0,4"/>
 
-            <TextBox x:Name="YobTextBox"
-                     Height="36"
-                     Padding="10,6"
-                     FontSize="14"
-                     Margin="0,0,0,12"/>
+            <ComboBox x:Name="YobComboBox"
+                      Height="36"
+                      FontSize="14"
+                      Margin="0,0,0,12"/>
 
             <TextBlock Text="Racing Number *"
                        FontSize="13"
                        FontWeight="SemiBold"
-                       Foreground="#555555"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
                        Margin="0,0,0,4"/>
 
             <TextBox x:Name="RacingNumberTextBox"
@@ -79,7 +78,7 @@
             <TextBlock Text="Gender *"
                        FontSize="13"
                        FontWeight="SemiBold"
-                       Foreground="#555555"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
                        Margin="0,0,0,4"/>
 
             <ComboBox x:Name="GenderComboBox"
@@ -101,8 +100,8 @@
             <Button Content="CANCEL"
                     Width="100"
                     Height="40"
-                    Background="#E2E8F0"
-                    Foreground="#20232A"
+                    Background="{DynamicResource SurfaceSecondaryBrush}"
+                    Foreground="{DynamicResource TextPrimaryBrush}"
                     FontWeight="Bold"
                     Margin="0,0,10,0"
                     Click="CancelButton_Click"/>
@@ -110,7 +109,7 @@
             <Button Content="SAVE"
                     Width="100"
                     Height="40"
-                    Background="#20232A"
+                    Background="{DynamicResource AccentBrush}"
                     Foreground="White"
                     FontWeight="Bold"
                     Click="AddButton_Click"/>
@@ -120,3 +119,4 @@
     </Grid>
 
 </Window>
+

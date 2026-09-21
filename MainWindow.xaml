@@ -6,17 +6,23 @@
         Height="700"
         MinWidth="900"
         MinHeight="600"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource PageBackgroundBrush}">
 
     <Grid>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="230"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
+
+        <!-- Navigation -->
+
         <Border Grid.Column="0"
-                Background="#20232A">
+                Background="{DynamicResource SurfaceBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,0,1,0">
 
             <Grid>
 
@@ -25,54 +31,66 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <StackPanel Grid.Row="0">
+
+                <StackPanel Grid.Row="0"
+                            Margin="18,28,18,0">
 
                     <TextBlock Text="RACING"
-                               Foreground="White"
+                               Foreground="{DynamicResource AccentBrush}"
                                FontSize="24"
                                FontWeight="Bold"
-                               Margin="25,30,25,0"/>
+                               Margin="10,0,10,0"/>
 
                     <TextBlock Text="TIME CLOCK"
-                               Foreground="#AAAAAA"
+                               Foreground="{DynamicResource TextPrimaryBrush}"
                                FontSize="16"
-                               Margin="25,0,25,5"/>
+                               FontWeight="SemiBold"
+                               Margin="10,0,10,4"/>
 
                     <TextBlock x:Name="SeasonLabel"
                                Text="Season"
-                               Foreground="#AAAAAA"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
                                FontSize="13"
-                               Margin="25,0,25,30"/>
+                               Margin="10,0,10,30"/>
 
-                    <Button Content="🏁  New Race"
-                            Height="55"
-                            Margin="15,0,15,10"
+
+                    <Button Content="NEW RACE"
+                            Height="48"
+                            Margin="0,0,0,10"
                             Click="NewRace_Click"/>
 
-                    <Button Content="👤  Racers"
-                            Height="55"
-                            Margin="15,0,15,10"
+                    <Button Content="RACERS"
+                            Height="48"
+                            Margin="0,0,0,10"
                             Click="Racers_Click"/>
 
-                    <Button Content="📋  Races Log"
-                            Height="55"
-                            Margin="15,0,15,10"
+                    <Button Content="RACES LOG"
+                            Height="48"
+                            Margin="0,0,0,10"
                             Click="RacesLog_Click"/>
 
                 </StackPanel>
 
+
                 <Button Grid.Row="1"
-                        Content="⚙  Settings"
-                        Height="55"
-                        Margin="15,10,15,20"
+                        Content="SETTINGS"
+                        Height="48"
+                        Margin="18,10,18,22"
                         Click="Settings_Click"/>
 
             </Grid>
 
         </Border>
 
-        <ContentControl Grid.Column="1"
-                        x:Name="PageContent"/>
+
+        <!-- Page -->
+
+        <Border Grid.Column="1"
+                Background="{DynamicResource PageBackgroundBrush}">
+
+            <ContentControl x:Name="PageContent"/>
+
+        </Border>
 
     </Grid>
 

@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Focusable="True">
 
-    <Grid Background="#F5F6F8">
+    <Grid Background="{DynamicResource PageBackgroundBrush}">
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -23,11 +23,11 @@
                            Text="1000m Race"
                            FontSize="32"
                            FontWeight="Bold"
-                           Foreground="#20232A"/>
+                           Foreground="{DynamicResource TextPrimaryBrush}"/>
 
                 <TextBlock x:Name="RaceInfoText"
                            FontSize="15"
-                           Foreground="#777777"
+                           Foreground="{DynamicResource TextSecondaryBrush}"
                            Margin="0,5,0,0"/>
 
             </StackPanel>
@@ -38,14 +38,14 @@
                 <TextBlock Text="RACE TIME"
                            FontSize="14"
                            FontWeight="SemiBold"
-                           Foreground="#777777"
+                           Foreground="{DynamicResource TextSecondaryBrush}"
                            HorizontalAlignment="Right"/>
 
                 <TextBlock x:Name="TimerText"
                            Text="00:00.000"
                            FontSize="42"
                            FontWeight="Bold"
-                           Foreground="#20232A"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
                            HorizontalAlignment="Right"/>
 
             </StackPanel>
@@ -62,7 +62,7 @@
             </Grid.RowDefinitions>
 
             <Border Grid.Row="0"
-                    Background="White"
+                    Background="{DynamicResource SurfaceBrush}"
                     CornerRadius="8"
                     Padding="20"
                     Margin="0,0,0,15">
@@ -71,7 +71,7 @@
                            Text="PRESS SPACE TO START"
                            FontSize="22"
                            FontWeight="Bold"
-                           Foreground="#20232A"
+                           Foreground="{DynamicResource TextPrimaryBrush}"
                            HorizontalAlignment="Center"/>
 
             </Border>
@@ -96,7 +96,7 @@
                         Visibility="Collapsed"
                         Click="SaveRaceButton_Click"/>
 
-                <Border Background="#20232A"
+                <Border Background="{DynamicResource AccentBrush}"
                         CornerRadius="8"
                         Padding="15">
 
@@ -114,3 +114,4 @@
     </Grid>
 
 </UserControl>
+

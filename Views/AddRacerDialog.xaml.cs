@@ -16,6 +16,35 @@ public partial class AddRacerDialog : Window
         InitializeComponent();
 
         GenderComboBox.SelectedIndex = 0;
+
+        LoadBirthYears();
+    }
+
+    private void LoadBirthYears()
+    {
+        Season? season =
+            AppSeasonService.Instance.CurrentSeason;
+
+        if (season == null)
+            return;
+
+        int youngestYear =
+            season.StartYear - 4;
+
+        int oldestYear =
+            season.StartYear - 40;
+
+        YobComboBox.Items.Clear();
+
+        for (int year = youngestYear;
+             year >= oldestYear;
+             year--)
+        {
+            YobComboBox.Items.Add(year);
+        }
+
+        if (YobComboBox.Items.Count > 0)
+            YobComboBox.SelectedIndex = 0;
     }
 
     private async void AddButton_Click(
@@ -27,9 +56,6 @@ public partial class AddRacerDialog : Window
 
         string name =
             NameTextBox.Text.Trim();
-
-        string yobText =
-            YobTextBox.Text.Trim();
 
         string racingNumber =
             RacingNumberTextBox.Text.Trim();
@@ -130,26 +156,10 @@ public partial class AddRacerDialog : Window
         // Year of Birth
         // -------------------------
 
-        if (!int.TryParse(
-                yobText,
-                out int yob))
+        if (YobComboBox.SelectedItem is not int yob)
         {
             MessageBox.Show(
-                "Year of Birth must be a valid year.",
-                "Validation Error",
-                MessageBoxButton.OK,
-                MessageBoxImage.Warning);
-
-            return;
-        }
-
-        int latestAllowedBirthYear =
-            season.StartYear - 4;
-
-        if (yob > latestAllowedBirthYear)
-        {
-            MessageBox.Show(
-                $"Year of Birth must be {latestAllowedBirthYear} or earlier for the {season.Name} season.",
+                "Please select a year of birth.",
                 "Validation Error",
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
@@ -216,4 +226,3 @@ public partial class AddRacerDialog : Window
         Close();
     }
 }
-

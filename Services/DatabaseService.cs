@@ -131,6 +131,19 @@ public class DatabaseService
             .ToListAsync();
     }
 
+    public async Task<List<Racer>> GetRacersAsync()
+    {
+        using RacingTimeClockDbContext db =
+            new RacingTimeClockDbContext();
+
+        await db.Database.EnsureCreatedAsync();
+
+        return await db.Racers
+            .Where(r => r.IsActive)
+            .OrderBy(r => r.Name)
+            .ToListAsync();
+    }
+
     public async Task<List<Season>> GetSeasonsAsync()
     {
         using RacingTimeClockDbContext db =

@@ -80,7 +80,7 @@ public partial class RaceView : UserControl
         {
             Border row = new Border
             {
-                Background = Brushes.White,
+                Background = (Brush)FindResource("SurfaceBrush"),
                 CornerRadius =
                     new CornerRadius(8),
                 Padding =
@@ -128,11 +128,7 @@ public partial class RaceView : UserControl
                     FontWeight =
                         FontWeights.Bold,
                     Foreground =
-                        new SolidColorBrush(
-                            Color.FromRgb(
-                                32,
-                                35,
-                                42))
+                        (Brush)FindResource("TextPrimaryBrush")
                 };
 
             Grid.SetColumn(
@@ -238,11 +234,7 @@ public partial class RaceView : UserControl
             "RACE RUNNING";
 
         StatusText.Foreground =
-            new SolidColorBrush(
-                Color.FromRgb(
-                    0,
-                    120,
-                    70));
+            (Brush)FindResource("SuccessBrush");
 
         StartTimerDisplay();
     }
@@ -300,11 +292,7 @@ public partial class RaceView : UserControl
                     "FINISHED";
 
                 status.Foreground =
-                    new SolidColorBrush(
-                        Color.FromRgb(
-                            0,
-                            120,
-                            70));
+                    (Brush)FindResource("SuccessBrush");
             }
 
             if (grid.Children[2]
@@ -337,11 +325,7 @@ public partial class RaceView : UserControl
             "RACE COMPLETE";
 
         StatusText.Foreground =
-            new SolidColorBrush(
-                Color.FromRgb(
-                    0,
-                    100,
-                    180));
+            (Brush)FindResource("AccentBrush");
 
         SaveRaceButton.Visibility =
             Visibility.Visible;
@@ -449,11 +433,7 @@ public partial class RaceView : UserControl
                 "RACE SAVED";
 
             StatusText.Foreground =
-                new SolidColorBrush(
-                    Color.FromRgb(
-                        0,
-                        120,
-                        70));
+                (Brush)FindResource("SuccessBrush");
         }
         catch (Exception ex)
         {
@@ -474,3 +454,4 @@ public partial class RaceView : UserControl
             $"{time.Milliseconds:000}";
     }
 }
+

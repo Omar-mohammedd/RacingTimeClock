@@ -45,7 +45,7 @@
                                Foreground="{DynamicResource TextSecondaryBrush}"/>
 
                     <TextBlock x:Name="RacerNameText"
-                               FontSize="20"
+                               FontSize="26"
                                FontWeight="Bold"
                                Foreground="{DynamicResource TextPrimaryBrush}"
                                Margin="0,4,0,0"/>
@@ -168,7 +168,7 @@
                                FontSize="11"
                                Foreground="{DynamicResource TextMutedBrush}"/>
                     <TextBlock x:Name="TotalRacesText"
-                               FontSize="20"
+                               FontSize="22"
                                FontWeight="Bold"
                                Foreground="{DynamicResource TextPrimaryBrush}"
                                Margin="0,4,0,0"/>
@@ -179,7 +179,7 @@
                                FontSize="11"
                                Foreground="{DynamicResource TextMutedBrush}"/>
                     <TextBlock x:Name="WinsText"
-                               FontSize="20"
+                               FontSize="22"
                                FontWeight="Bold"
                                Foreground="{DynamicResource SuccessBrush}"
                                Margin="0,4,0,0"/>
@@ -190,7 +190,7 @@
                                FontSize="11"
                                Foreground="{DynamicResource TextMutedBrush}"/>
                     <TextBlock x:Name="PodiumsText"
-                               FontSize="20"
+                               FontSize="22"
                                FontWeight="Bold"
                                Foreground="{DynamicResource AccentBrush}"
                                Margin="0,4,0,0"/>
@@ -222,8 +222,8 @@
                       Background="{DynamicResource SurfaceBrush}"
                       BorderThickness="1"
                       BorderBrush="{DynamicResource BorderBrush}"
-                      RowHeight="38"
-                      FontSize="13">
+                      RowHeight="40"
+                      FontSize="14">
 
                 <DataGrid.Columns>
 
@@ -261,7 +261,7 @@
                 <Button x:Name="EditButton"
                         Content="EDIT RACER"
                         Width="120"
-                        Height="42"
+                        Height="40"
                         Background="{DynamicResource AccentBrush}"
                         Foreground="White"
                         FontWeight="Bold"
@@ -271,7 +271,7 @@
                 <Button x:Name="SaveButton"
                         Content="SAVE CHANGES"
                         Width="135"
-                        Height="42"
+                        Height="40"
                         Background="{DynamicResource SuccessBrush}"
                         Foreground="White"
                         FontWeight="Bold"
@@ -282,7 +282,7 @@
                 <Button x:Name="CancelEditButton"
                         Content="CANCEL"
                         Width="100"
-                        Height="42"
+                        Height="40"
                         Background="{DynamicResource TextMutedBrush}"
                         Foreground="White"
                         FontWeight="Bold"
@@ -298,7 +298,7 @@
                 <Button x:Name="DeleteButton"
                         Content="DEACTIVATE"
                         Width="120"
-                        Height="42"
+                        Height="40"
                         Background="{DynamicResource DangerBrush}"
                         Foreground="White"
                         FontWeight="Bold"
@@ -307,7 +307,7 @@
 
                 <Button Content="CLOSE"
                         Width="100"
-                        Height="42"
+                        Height="40"
                         Background="{DynamicResource AccentBrush}"
                         Foreground="White"
                         FontWeight="Bold"
@@ -318,7 +318,6 @@
 
     </Grid>
 </Window>
-
 
 
 

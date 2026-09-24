@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.EntityFrameworkCore;
 using RacingTimeClock.Data;
@@ -17,12 +17,12 @@ public partial class NewRaceView : UserControl
 {
     private string selectedRaceType = "Short";
     private string selectedDistance = "100m";
-    private int selectedRacerCount = 1;
+    private int selectedRacerCount = 4;
+    private string selectedGender = "All";
     private string selectedCategory = "All";
 
     private List<Racer> availableRacers = new();
-
-    private readonly List<ComboBox> racerComboBoxes = new();
+    private readonly List<Racer> selectedRacers = new();
 
     public class RacerSelectionItem
     {
@@ -31,10 +31,10 @@ public partial class NewRaceView : UserControl
         public string DisplayName { get; set; } =
             string.Empty;
 
-        public override string ToString()
-        {
-            return DisplayName;
-        }
+        public bool IsPlaceholder { get; set; }
+
+        public override string ToString() =>
+            DisplayName;
     }
 
     public event Action<
@@ -65,11 +65,10 @@ public partial class NewRaceView : UserControl
         InitializeComponent();
 
         BuildDistanceButtons();
-        UpdateRacerCountDisplay();
         UpdateRaceTypeButtons();
         UpdateDistanceButtons();
-        
-        UpdateCategoryButtons();
+        UpdateDistanceHint();
+        UpdateRacerCountDisplay();
 
         Loaded += NewRaceView_Loaded;
     }
@@ -88,12 +87,15 @@ public partial class NewRaceView : UserControl
             using RacingTimeClockDbContext db =
                 new RacingTimeClockDbContext();
 
-            availableRacers = await db.Racers
-                .Where(r => r.IsActive)
-                .OrderBy(r => r.Name)
-                .ToListAsync();
+            availableRacers =
+                await db.Racers
+                    .Where(r => r.IsActive)
+                    .OrderBy(r => r.Name)
+                    .ToListAsync();
 
-            RebuildRacerSelectionUI();
+            RebuildSearchResults();
+        RebuildRacerPicker();
+            RebuildRacerTable();
         }
         catch (Exception ex)
         {
@@ -103,207 +105,6 @@ public partial class NewRaceView : UserControl
                 MessageBoxButton.OK,
                 MessageBoxImage.Error);
         }
-    }
-
-    private Season? GetSelectedSeason()
-    {
-        return AppSeasonService.Instance.CurrentSeason;
-    }
-
-    private bool IsRacerInSelectedCategory(
-        Racer racer)
-    {
-        Season? season = GetSelectedSeason();
-
-        if (season == null)
-            return false;
-
-        string category =
-            SeasonService.GetCategory(
-                racer,
-                season);
-
-        return selectedCategory switch
-        {
-            "Seniors" => category == "Senior",
-            "Juniors" => category == "Junior",
-            "Youth" => category == "Youth",
-            _ => true
-        };
-    }
-
-    private void RebuildRacerSelectionUI()
-    {
-        RacerSelectionPanel.Children.Clear();
-        racerComboBoxes.Clear();
-
-        if (GetSelectedSeason() == null)
-            return;
-
-        List<Racer> filteredRacers =
-            availableRacers
-                .Where(IsRacerInSelectedCategory)
-                .ToList();
-
-        for (int i = 1;
-             i <= selectedRacerCount;
-             i++)
-        {
-            Grid container = new Grid
-            {
-                Margin =
-                    new Thickness(0, 0, 0, 10)
-            };
-
-            container.ColumnDefinitions.Add(
-                new ColumnDefinition
-                {
-                    Width = new GridLength(100)
-                });
-
-            container.ColumnDefinitions.Add(
-                new ColumnDefinition
-                {
-                    Width = new GridLength(
-                        1,
-                        GridUnitType.Star)
-                });
-
-            TextBlock label = new TextBlock
-            {
-                Text = $"Lane {i}:",
-                FontSize = 16,
-                FontWeight =
-                    FontWeights.SemiBold,
-                VerticalAlignment =
-                    VerticalAlignment.Center
-            };
-
-            Grid.SetColumn(label, 0);
-
-            ComboBox comboBox = new ComboBox
-            {
-                Height = 38,
-                FontSize = 15,
-                VerticalContentAlignment =
-                    VerticalAlignment.Center
-            };
-
-            comboBox.Items.Add(
-                new RacerSelectionItem
-                {
-                    Racer = null,
-                    DisplayName = $"Guest {i}"
-                });
-
-            foreach (Racer racer in filteredRacers)
-            {
-                comboBox.Items.Add(
-                    new RacerSelectionItem
-                    {
-                        Racer = racer,
-                        DisplayName =
-                            $"{racer.Name} | {racer.RacingNumber}"
-                    });
-            }
-
-            comboBox.SelectedIndex = 0;
-
-            Grid.SetColumn(comboBox, 1);
-
-            container.Children.Add(label);
-            container.Children.Add(comboBox);
-
-            RacerSelectionPanel.Children.Add(
-                container);
-
-            racerComboBoxes.Add(comboBox);
-        }
-    }
-
-    private void AllCategoryButton_Click(
-        object sender,
-        RoutedEventArgs e)
-    {
-        selectedCategory = "All";
-
-        UpdateCategoryButtons();
-        RebuildRacerSelectionUI();
-    }
-
-    private void SeniorCategoryButton_Click(
-        object sender,
-        RoutedEventArgs e)
-    {
-        selectedCategory = "Seniors";
-
-        UpdateCategoryButtons();
-        RebuildRacerSelectionUI();
-    }
-
-    private void JuniorCategoryButton_Click(
-        object sender,
-        RoutedEventArgs e)
-    {
-        selectedCategory = "Juniors";
-
-        UpdateCategoryButtons();
-        RebuildRacerSelectionUI();
-    }
-
-    private void YouthCategoryButton_Click(
-        object sender,
-        RoutedEventArgs e)
-    {
-        selectedCategory = "Youth";
-
-        UpdateCategoryButtons();
-        RebuildRacerSelectionUI();
-    }
-
-    private void UpdateCategoryButtons()
-    {
-        SetButtonSelected(
-            AllCategoryButton,
-            selectedCategory == "All");
-
-        SetButtonSelected(
-            SeniorCategoryButton,
-            selectedCategory == "Seniors");
-
-        SetButtonSelected(
-            JuniorCategoryButton,
-            selectedCategory == "Juniors");
-
-        SetButtonSelected(
-            YouthCategoryButton,
-            selectedCategory == "Youth");
-    }
-
-    private void ShortButton_Click(
-        object sender,
-        RoutedEventArgs e)
-    {
-        selectedRaceType = "Short";
-        selectedDistance = "100m";
-
-        BuildDistanceButtons();
-
-        UpdateRaceTypeButtons();
-        UpdateDistanceButtons();
-    }
-
-    private void LongButton_Click(
-        object sender,
-        RoutedEventArgs e)
-    {
-        selectedRaceType = "Long";
-        selectedDistance = "5K";
-
-        BuildDistanceButtons();
-
-        UpdateRaceTypeButtons();
-        UpdateDistanceButtons();
     }
 
     private void BuildDistanceButtons()
@@ -320,17 +121,26 @@ public partial class NewRaceView : UserControl
             Button button = new Button
             {
                 Content = distance,
-                Width = 110,
-                Height = 50,
+
+                Style =
+                    (Style)FindResource(
+                        "RaceChoiceButtonStyle"),
+
+                Width =
+                    distance == "1000m"
+                        ? 70
+                        : 66,
+
+                Height = 34,
+
                 Margin =
-                    new Thickness(0, 0, 10, 10),
-                FontSize = 15,
-                FontWeight =
-                    FontWeights.SemiBold,
+                    new Thickness(0, 0, 8, 0),
+
                 Tag = distance
             };
 
-            button.Click += DistanceButton_Click;
+            button.Click +=
+                DistanceButton_Click;
 
             DistancePanel.Children.Add(button);
         }
@@ -344,42 +154,36 @@ public partial class NewRaceView : UserControl
             button.Tag is string distance)
         {
             selectedDistance = distance;
-
             UpdateDistanceButtons();
         }
     }
 
-    private void UpdateRacerCountDisplay()
-    {
-        RacerCountText.Text =
-            selectedRacerCount.ToString();
-    }
-
-    private void DecreaseRacerCountButton_Click(
+    private void ShortButton_Click(
         object sender,
-        MouseButtonEventArgs e)
+        RoutedEventArgs e)
     {
-        if (selectedRacerCount <= 1)
-            return;
+        selectedRaceType = "Short";
+        selectedDistance = "100m";
 
-        selectedRacerCount--;
-
-        UpdateRacerCountDisplay();
-        RebuildRacerSelectionUI();
+        BuildDistanceButtons();
+        UpdateRaceTypeButtons();
+        UpdateDistanceButtons();
+        UpdateDistanceHint();
     }
 
-    private void IncreaseRacerCountButton_Click(
+    private void LongButton_Click(
         object sender,
-        MouseButtonEventArgs e)
+        RoutedEventArgs e)
     {
-        if (selectedRacerCount >= 9)
-            return;
+        selectedRaceType = "Long";
+        selectedDistance = "5K";
 
-        selectedRacerCount++;
-
-        UpdateRacerCountDisplay();
-        RebuildRacerSelectionUI();
+        BuildDistanceButtons();
+        UpdateRaceTypeButtons();
+        UpdateDistanceButtons();
+        UpdateDistanceHint();
     }
+
     private void UpdateRaceTypeButtons()
     {
         SetButtonSelected(
@@ -412,37 +216,678 @@ public partial class NewRaceView : UserControl
         if (selected)
         {
             button.Background =
-                new SolidColorBrush(
-                    Color.FromRgb(
-                        32,
-                        35,
-                        42));
+                (Brush)FindResource(
+                    "AccentBrush");
 
             button.Foreground =
                 Brushes.White;
+
+            button.BorderBrush =
+                (Brush)FindResource(
+                    "AccentBrush");
         }
         else
         {
             button.Background =
-                Brushes.White;
+                (Brush)FindResource(
+                    "SurfaceBrush");
 
             button.Foreground =
-                new SolidColorBrush(
-                    Color.FromRgb(
-                        32,
-                        35,
-                        42));
+                (Brush)FindResource(
+                    "TextPrimaryBrush");
+
+            button.BorderBrush =
+                (Brush)FindResource(
+                    "BorderBrush");
         }
+    }
+
+    private void UpdateDistanceHint()
+    {
+        DistanceHintText.Text =
+            selectedRaceType == "Short"
+                ? "Short: 100m · 200m · 400m · 500m · 1000m"
+                : "Long: 5K · 10K · 15K";
+    }
+
+    private void UpdateRacerCountDisplay()
+    {
+        RacerCountText.Text =
+            selectedRacerCount.ToString();
+
+        SelectedCountText.Text =
+            $"{selectedRacers.Count} / {selectedRacerCount} racers selected";
+    }
+
+    private void DecreaseRacerCountButton_Click(
+        object sender,
+        MouseButtonEventArgs e)
+    {
+        if (selectedRacerCount <= 1)
+            return;
+
+        selectedRacerCount--;
+
+        while (selectedRacers.Count >
+               selectedRacerCount)
+        {
+            selectedRacers.RemoveAt(
+                selectedRacers.Count - 1);
+        }
+
+        UpdateRacerCountDisplay();
+        RebuildRacerTable();
+        RebuildSearchResults();
+        RebuildRacerPicker();
+    }
+
+    private void IncreaseRacerCountButton_Click(
+        object sender,
+        MouseButtonEventArgs e)
+    {
+        if (selectedRacerCount >= 9)
+            return;
+
+        selectedRacerCount++;
+
+        UpdateRacerCountDisplay();
+        RebuildRacerTable();
+        RebuildSearchResults();
+        RebuildRacerPicker();
+    }
+
+    private IEnumerable<Racer> GetFilteredRacers()
+    {
+        IEnumerable<Racer> racers =
+            availableRacers;
+
+        if (selectedGender == "Male")
+        {
+            racers =
+                racers.Where(r => r.IsMale);
+        }
+        else if (selectedGender == "Female")
+        {
+            racers =
+                racers.Where(r => !r.IsMale);
+        }
+
+        if (selectedCategory != "All")
+        {
+            Season? season =
+                AppSeasonService.Instance.CurrentSeason;
+
+            if (season != null)
+            {
+                racers =
+                    racers.Where(r =>
+                        SeasonService.GetCategory(
+                            r,
+                            season) ==
+                        selectedCategory);
+            }
+        }
+
+        string search =
+            SearchTextBox.Text ==
+            "Search for player"
+                ? string.Empty
+                : SearchTextBox.Text.Trim();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            racers =
+                racers.Where(r =>
+                    r.Name.Contains(
+                        search,
+                        StringComparison.OrdinalIgnoreCase) ||
+                    r.RacingNumber.Contains(
+                        search,
+                        StringComparison.OrdinalIgnoreCase));
+        }
+
+        return racers
+            .Where(r =>
+                !selectedRacers.Any(
+                    selected =>
+                        selected.Id == r.Id))
+            .OrderBy(r => r.Name);
+    }
+
+    private void RebuildSearchResults()
+    {
+        SearchResultsPanel.Children.Clear();
+
+        string search =
+            SearchTextBox.Text ==
+            "Search for player"
+                ? string.Empty
+                : SearchTextBox.Text.Trim();
+
+        if (string.IsNullOrWhiteSpace(search))
+        {
+            SearchResultsBorder.Visibility =
+                Visibility.Collapsed;
+
+            return;
+        }
+
+        List<Racer> racers =
+            GetFilteredRacers().ToList();
+
+        if (racers.Count == 0)
+        {
+            SearchResultsPanel.Children.Add(
+                new TextBlock
+                {
+                    Text = "No matching racers",
+                    FontSize = 12,
+                    Foreground =
+                        (Brush)FindResource(
+                            "TextSecondaryBrush"),
+                    Padding =
+                        new Thickness(
+                            12,
+                            10,
+                            12,
+                            10)
+                });
+
+            SearchResultsBorder.Visibility =
+                Visibility.Visible;
+
+            return;
+        }
+
+        foreach (Racer racer in racers)
+        {
+            Button resultButton =
+                new Button
+                {
+                    Content =
+                        $"{racer.Name}  |  {racer.RacingNumber}",
+
+                    Tag = racer,
+
+                    Style =
+                        (Style)FindResource(
+                            "SearchResultButtonStyle")
+                };
+
+            resultButton.Click +=
+                SearchResultButton_Click;
+
+            SearchResultsPanel.Children.Add(
+                resultButton);
+        }
+
+        SearchResultsBorder.Visibility =
+            Visibility.Visible;
+    }
+
+    private void SearchResultButton_Click(
+        object sender,
+        RoutedEventArgs e)
+    {
+        if (sender is not Button button ||
+            button.Tag is not Racer racer)
+        {
+            return;
+        }
+
+        if (selectedRacers.Count >=
+            selectedRacerCount)
+        {
+            ErrorText.Text =
+                "Increase the number of racers before adding another racer.";
+
+            return;
+        }
+
+        if (selectedRacers.Any(
+                r => r.Id == racer.Id))
+        {
+            return;
+        }
+
+        ErrorText.Text =
+            string.Empty;
+
+        selectedRacers.Add(racer);
+
+        SearchTextBox.Text =
+            string.Empty;
+
+        SearchTextBox.Foreground =
+            (Brush)FindResource(
+                "TextMutedBrush");
+
+        SearchResultsBorder.Visibility =
+            Visibility.Collapsed;
+
+        UpdateRacerCountDisplay();
+        RebuildRacerTable();
+        RebuildSearchResults();
+        RebuildRacerPicker();
+    }
+
+    private void RebuildRacerPicker(){RacerPickerComboBox.SelectionChanged -= RacerPickerComboBox_SelectionChanged;RacerPickerComboBox.Items.Clear();RacerPickerComboBox.Items.Add(new RacerSelectionItem { Racer = null, DisplayName = "Select racer", IsPlaceholder = true });foreach (Racer racer in GetFilteredRacers()){RacerPickerComboBox.Items.Add(new RacerSelectionItem { Racer = racer, DisplayName = $"{racer.Name} | {racer.RacingNumber}" });}RacerPickerComboBox.SelectedIndex = 0;RacerPickerComboBox.SelectionChanged += RacerPickerComboBox_SelectionChanged;}
+
+    private void RacerPickerComboBox_SelectionChanged(
+        object sender,
+        SelectionChangedEventArgs e)
+    {
+        if (RacerPickerComboBox.SelectedItem
+            is not RacerSelectionItem item ||
+            item.Racer == null)
+        {
+            return;
+        }
+
+        if (selectedRacers.Count >=
+            selectedRacerCount)
+        {
+            ErrorText.Text =
+                "Increase the number of racers before adding another racer.";
+
+            RacerPickerComboBox.SelectedIndex = 0;
+            return;
+        }
+
+        if (selectedRacers.Any(
+                r => r.Id == item.Racer.Id))
+        {
+            RacerPickerComboBox.SelectedIndex = 0;
+            return;
+        }
+
+        ErrorText.Text =
+            string.Empty;
+
+        selectedRacers.Add(item.Racer);
+
+        UpdateRacerCountDisplay();
+        RebuildRacerTable();
+        RebuildSearchResults();
+        RebuildRacerPicker();
+
+        RacerPickerComboBox.SelectedIndex = 0;
+    }
+    private void GenderFilter_Changed(
+        object sender,
+        RoutedEventArgs e)
+    {
+        if (!IsLoaded)
+            return;
+
+        if (MaleRadio.IsChecked == true)
+        {
+            selectedGender = "Male";
+        }
+        else if (FemaleRadio.IsChecked == true)
+        {
+            selectedGender = "Female";
+        }
+        else
+        {
+            selectedGender = "All";
+        }
+
+        RebuildSearchResults();
+        RebuildRacerPicker();
+    }
+
+    private void CategoryComboBox_SelectionChanged(
+        object sender,
+        SelectionChangedEventArgs e)
+    {
+        if (!IsLoaded)
+            return;
+
+        selectedCategory =
+            CategoryComboBox.SelectedItem
+                is ComboBoxItem item
+                ? item.Content?.ToString() ??
+                  "All"
+                : "All";
+
+        RebuildSearchResults();
+        RebuildRacerPicker();
+    }
+
+    private void RebuildRacerTable()
+    {
+        RacerTablePanel.Children.Clear();
+
+        Season? season =
+            AppSeasonService.Instance.CurrentSeason;
+
+        for (int i = 0;
+             i < selectedRacers.Count;
+             i++)
+        {
+            Racer racer =
+                selectedRacers[i];
+
+            string category =
+                season == null
+                    ? "—"
+                    : SeasonService.GetCategory(
+                        racer,
+                        season);
+
+            Grid row =
+                new Grid
+                {
+                    Height = 44,
+                    Margin =
+                        new Thickness(
+                            8,
+                            0,
+                            8,
+                            0)
+                };
+
+            row.ColumnDefinitions.Add(
+                new ColumnDefinition
+                {
+                    Width =
+                        new GridLength(65)
+                });
+
+            row.ColumnDefinitions.Add(
+                new ColumnDefinition
+                {
+                    Width =
+                        new GridLength(
+                            1,
+                            GridUnitType.Star)
+                });
+
+            row.ColumnDefinitions.Add(
+                new ColumnDefinition
+                {
+                    Width =
+                        new GridLength(105)
+                });
+
+            row.ColumnDefinitions.Add(
+                new ColumnDefinition
+                {
+                    Width =
+                        new GridLength(75)
+                });
+
+            row.ColumnDefinitions.Add(
+                new ColumnDefinition
+                {
+                    Width =
+                        new GridLength(75)
+                });
+
+            row.ColumnDefinitions.Add(
+                new ColumnDefinition
+                {
+                    Width =
+                        new GridLength(80)
+                });
+
+            row.ColumnDefinitions.Add(
+                new ColumnDefinition
+                {
+                    Width =
+                        new GridLength(75)
+                });
+
+
+            Border rowBorder =
+                new Border
+                {
+                    Background =
+                        (Brush)FindResource(
+                            "SurfaceBrush"),
+
+                    BorderBrush =
+                        (Brush)FindResource(
+                            "BorderBrush"),
+
+                    BorderThickness =
+                        new Thickness(
+                            0,
+                            0,
+                            0,
+                            1)
+                };
+
+            Grid rowContent =
+                new Grid();
+
+            for (int c = 0; c < 7; c++)
+            {
+                rowContent.ColumnDefinitions.Add(
+                    new ColumnDefinition
+                    {
+                        Width =
+                            row.ColumnDefinitions[c]
+                                .Width
+                    });
+            }
+
+
+            TextBlock laneText = new TextBlock { Text = (i + 1).ToString(), FontSize = 11, FontWeight = FontWeights.SemiBold, Foreground = (Brush)FindResource("TextPrimaryBrush"), HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center }; Grid.SetColumn(laneText, 0); rowContent.Children.Add(laneText);
+
+
+            TextBlock name =
+                CreateTableText(
+                    racer.Name,
+                    true);
+
+            Grid.SetColumn(
+                name,
+                1);
+
+            rowContent.Children.Add(
+                name);
+
+
+            TextBlock racingNumber =
+                CreateTableText(
+                    racer.RacingNumber,
+                    true);
+
+            Grid.SetColumn(
+                racingNumber,
+                2);
+
+            rowContent.Children.Add(
+                racingNumber);
+
+
+            TextBlock gender =
+                CreateTableText(
+                    racer.IsMale
+                        ? "Male"
+                        : "Female");
+
+            Grid.SetColumn(
+                gender,
+                3);
+
+            rowContent.Children.Add(
+                gender);
+
+
+            TextBlock yearOfBirth =
+                CreateTableText(
+                    racer.YearOfBirth.ToString());
+
+            Grid.SetColumn(
+                yearOfBirth,
+                4);
+
+            rowContent.Children.Add(
+                yearOfBirth);
+
+
+            TextBlock categoryText =
+                CreateTableText(
+                    category,
+                    true);
+
+            Grid.SetColumn(
+                categoryText,
+                5);
+
+            rowContent.Children.Add(
+                categoryText);
+
+
+            Button removeButton =
+                new Button
+                {
+                    Content = "Remove",
+
+                    Tag = racer,
+
+                    Style =
+                        (Style)FindResource(
+                            "RemoveTextButtonStyle"),
+
+                    HorizontalAlignment =
+                        HorizontalAlignment.Right,
+
+                    VerticalAlignment =
+                        VerticalAlignment.Center,
+
+                    Margin =
+                        new Thickness(
+                            0,
+                            0,
+                            4,
+                            0)
+                };
+
+            removeButton.Click +=
+                RemoveRacerButton_Click;
+
+            Grid.SetColumn(
+                removeButton,
+                6);
+
+            rowContent.Children.Add(
+                removeButton);
+
+
+            rowBorder.Child =
+                rowContent;
+
+            RacerTablePanel.Children.Add(
+                rowBorder);
+        }
+
+        UpdateRacerCountDisplay();
+    }
+
+    private TextBlock CreateTableText(
+        string text,
+        bool semiBold = false)
+    {
+        return new TextBlock
+        {
+            Text = text,
+
+            FontSize = 11,
+
+            FontWeight =
+                semiBold
+                    ? FontWeights.SemiBold
+                    : FontWeights.Normal,
+
+            Foreground =
+                (Brush)FindResource(
+                    "TextPrimaryBrush"),
+
+            VerticalAlignment =
+                VerticalAlignment.Center
+        };
+    }
+
+    private void RemoveRacerButton_Click(
+        object sender,
+        RoutedEventArgs e)
+    {
+        if (sender is Button button &&
+            button.Tag is Racer racer)
+        {
+            selectedRacers.RemoveAll(
+                r => r.Id == racer.Id);
+
+            ErrorText.Text =
+                string.Empty;
+
+            UpdateRacerCountDisplay();
+            RebuildRacerTable();
+            RebuildSearchResults();
+        RebuildRacerPicker();
+        }
+    }
+
+    private void SearchTextBox_GotFocus(
+        object sender,
+        RoutedEventArgs e)
+    {
+        if (SearchTextBox.Text ==
+            "Search for player")
+        {
+            SearchTextBox.Text =
+                string.Empty;
+
+            SearchTextBox.Foreground =
+                (Brush)FindResource(
+                    "TextPrimaryBrush");
+        }
+    }
+
+    private void SearchTextBox_LostFocus(
+        object sender,
+        RoutedEventArgs e)
+    {
+        if (string.IsNullOrWhiteSpace(
+                SearchTextBox.Text))
+        {
+            SearchTextBox.Text =
+                "Search for player";
+
+            SearchTextBox.Foreground =
+                (Brush)FindResource(
+                    "TextMutedBrush");
+
+            SearchResultsBorder.Visibility =
+                Visibility.Collapsed;
+        }
+    }
+
+    private void SearchTextBox_TextChanged(
+        object sender,
+        TextChangedEventArgs e)
+    {
+        if (!IsLoaded)
+            return;
+
+        RebuildSearchResults();
+        RebuildRacerPicker();
     }
 
     private void StartRaceButton_Click(
         object sender,
         RoutedEventArgs e)
     {
-        ErrorText.Text = string.Empty;
+        ErrorText.Text =
+            string.Empty;
 
         Season? season =
-            AppSeasonService.Instance.CurrentSeason;
+            AppSeasonService.Instance
+                .CurrentSeason;
 
         if (season == null)
         {
@@ -452,39 +897,7 @@ public partial class NewRaceView : UserControl
             return;
         }
 
-        List<RacerSelectionItem> selections =
-            racerComboBoxes
-                .Select(combo =>
-                    combo.SelectedItem
-                    as RacerSelectionItem
-                    ?? new RacerSelectionItem
-                    {
-                        Racer = null,
-                        DisplayName = "Guest"
-                    })
-                .ToList();
-
-        HashSet<int> selectedIds =
-            new HashSet<int>();
-
-        foreach (RacerSelectionItem selection
-                 in selections)
-        {
-            if (selection.Racer == null)
-                continue;
-
-            if (!selectedIds.Add(
-                    selection.Racer.Id))
-            {
-                ErrorText.Text =
-                    "The same racer cannot be assigned " +
-                    "to more than one lane.";
-
-                return;
-            }
-        }
-
-        if (selections.Count !=
+        if (selectedRacers.Count !=
             selectedRacerCount)
         {
             ErrorText.Text =
@@ -492,6 +905,18 @@ public partial class NewRaceView : UserControl
 
             return;
         }
+
+        List<RacerSelectionItem> selections =
+            selectedRacers
+                .Select(r =>
+                    new RacerSelectionItem
+                    {
+                        Racer = r,
+
+                        DisplayName =
+                            $"{r.Name} | {r.RacingNumber}"
+                    })
+                .ToList();
 
         RaceStarted?.Invoke(
             selectedDistance,
@@ -501,7 +926,6 @@ public partial class NewRaceView : UserControl
             selections);
     }
 }
-
 
 
 

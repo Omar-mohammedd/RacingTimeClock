@@ -12,8 +12,8 @@
 
         <!-- Header -->
         <StackPanel Grid.Row="0" Margin="0,0,0,20">
-            <TextBlock x:Name="RaceTitleText" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
-            <TextBlock x:Name="RaceMetaText" FontSize="13" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
+            <TextBlock x:Name="RaceTitleText" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+            <TextBlock x:Name="RaceMetaText" FontSize="14" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,4,0,0"/>
         </StackPanel>
 
         <!-- Leaderboard DataGrid -->
@@ -25,8 +25,8 @@
                   Background="{DynamicResource SurfaceBrush}"
                   BorderThickness="1"
                   BorderBrush="{DynamicResource BorderBrush}"
-                  RowHeight="38"
-                  FontSize="13">
+                  RowHeight="40"
+                  FontSize="14">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Pos" Binding="{Binding PositionDisplay}" Width="80"/>
                 <DataGridTextColumn Header="Racer ID" Binding="{Binding RacerId}" Width="120"/>
@@ -37,9 +37,8 @@
 
         <!-- Footer -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
-            <Button Content="CLOSE" Width="100" Height="42" Background="{DynamicResource AccentBrush}" Foreground="White" FontWeight="Bold" Click="CloseButton_Click"/>
+            <Button Content="CLOSE" Width="100" Height="40" Background="{DynamicResource AccentBrush}" Foreground="White" FontWeight="Bold" Click="CloseButton_Click"/>
         </StackPanel>
     </Grid>
 </Window>
-
 

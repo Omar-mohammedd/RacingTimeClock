@@ -4,7 +4,7 @@
 
     <Grid Background="{DynamicResource PageBackgroundBrush}">
 
-        <StackPanel Margin="30,24,30,24">
+        <StackPanel Margin="45">
 
             <Grid Margin="0,0,0,20">
 
@@ -16,12 +16,12 @@
                 <StackPanel Grid.Column="0">
 
                     <TextBlock Text="Racers"
-                               FontSize="28"
+                               FontSize="32"
                                FontWeight="Bold"
                                Foreground="{DynamicResource TextPrimaryBrush}"/>
 
                     <TextBlock Text="Manage registered racers or double-click a racer to view history."
-                               FontSize="13"
+                               FontSize="15"
                                Foreground="{DynamicResource TextSecondaryBrush}"
                                Margin="0,5,0,0"/>
 
@@ -30,10 +30,10 @@
                 <Button Grid.Column="1"
                         Content="+ ADD RACER"
                         Width="140"
-                        Height="42"
+                        Height="45"
                         Background="{DynamicResource AccentBrush}"
                         Foreground="White"
-                        FontSize="13"
+                        FontSize="14"
                         FontWeight="Bold"
                         Click="AddRacerButton_Click"/>
 
@@ -54,7 +54,7 @@
                              Width="260"
                              Height="38"
                              Padding="10,8"
-                             FontSize="13"
+                             FontSize="14"
                              TextChanged="SearchTextBox_TextChanged"/>
 
                     <TextBlock x:Name="SearchPlaceholder"
@@ -62,7 +62,7 @@
                                Margin="10,0,0,0"
                                VerticalAlignment="Center"
                                Foreground="{DynamicResource TextMutedBrush}"
-                               FontSize="13"
+                               FontSize="14"
                                IsHitTestVisible="False">
 
                         <TextBlock.Style>
@@ -134,7 +134,7 @@
                                     <ControlTemplate TargetType="ListBoxItem">
 
                                         <Border x:Name="Border"
-                                                CornerRadius="9"
+                                                CornerRadius="6"
                                                 Background="{TemplateBinding Background}"
                                                 Padding="{TemplateBinding Padding}">
 
@@ -181,8 +181,8 @@
                       Background="{DynamicResource SurfaceBrush}"
                       BorderThickness="1"
                       BorderBrush="{DynamicResource BorderBrush}"
-                      RowHeight="38"
-                      FontSize="13"
+                      RowHeight="45"
+                      FontSize="15"
                       MouseDoubleClick="RacersDataGrid_MouseDoubleClick">
 
                 <DataGrid.Columns>
@@ -216,7 +216,6 @@
     </Grid>
 
 </UserControl>
-
 
 
 

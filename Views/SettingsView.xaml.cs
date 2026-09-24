@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using RacingTimeClock.Models;
 using RacingTimeClock.Services;
+using RacingThemeMode = RacingTimeClock.Services.ThemeMode;
 
 namespace RacingTimeClock.Views;
 
@@ -26,6 +27,7 @@ public partial class SettingsView : UserControl
         RoutedEventArgs e)
     {
         LoadTheme();
+        LoadAccent();
 
         await LoadSeasonsAsync();
     }
@@ -37,12 +39,50 @@ public partial class SettingsView : UserControl
         ThemeComboBox.SelectedIndex =
             ThemeService.CurrentMode switch
             {
-                RacingTimeClock.Services.ThemeMode.Light => 0,
-                RacingTimeClock.Services.ThemeMode.Dark => 1,
+                RacingThemeMode.Light => 0,
+                RacingThemeMode.Dark => 1,
                 _ => 2
             };
 
         loading = false;
+    }
+
+    private void LoadAccent()
+    {
+        loading = true;
+
+        AccentComboBox.SelectedIndex =
+            ThemeService.CurrentAccent switch
+            {
+                AccentColor.Red => 0,
+                AccentColor.Blue => 1,
+                AccentColor.Green => 2,
+                AccentColor.Purple => 3,
+                AccentColor.Orange => 4,
+                _ => 0
+            };
+
+        loading = false;
+    }
+
+    private void AccentComboBox_SelectionChanged(
+        object sender,
+        SelectionChangedEventArgs e)
+    {
+        if (loading)
+            return;
+
+        AccentColor accent =
+            AccentComboBox.SelectedIndex switch
+            {
+                1 => AccentColor.Blue,
+                2 => AccentColor.Green,
+                3 => AccentColor.Purple,
+                4 => AccentColor.Orange,
+                _ => AccentColor.Red
+            };
+
+        ThemeService.SetAccent(accent);
     }
 
     private void ThemeComboBox_SelectionChanged(
@@ -52,12 +92,12 @@ public partial class SettingsView : UserControl
         if (loading)
             return;
 
-        RacingTimeClock.Services.ThemeMode mode =
+        RacingThemeMode mode =
             ThemeComboBox.SelectedIndex switch
             {
-                0 => RacingTimeClock.Services.ThemeMode.Light,
-                1 => RacingTimeClock.Services.ThemeMode.Dark,
-                _ => RacingTimeClock.Services.ThemeMode.System
+                0 => RacingThemeMode.Light,
+                1 => RacingThemeMode.Dark,
+                _ => RacingThemeMode.System
             };
 
         ThemeService.Apply(mode);
@@ -84,24 +124,39 @@ public partial class SettingsView : UserControl
                 .OrderBy(s => s.StartYear)
                 .ToList();
 
+            Season detectedSeason =
+                SeasonService.GetAutomaticallyDetectedSeason(
+                    seasons,
+                    DateTime.Now);
+
             SeasonComboBox.Items.Clear();
 
-            Season? detectedSeason =
-                AppSeasonService.Instance.CurrentSeason;
-
-            string autoText =
-                detectedSeason != null
-                    ? $"Auto ({detectedSeason.Name})"
-                    : "Auto";
-
-            SeasonComboBox.Items.Add(autoText);
+            SeasonComboBox.Items.Add(
+                $"Auto ({detectedSeason.Name})");
 
             foreach (Season season in seasons)
-            {
                 SeasonComboBox.Items.Add(season.Name);
-            }
 
-            SeasonComboBox.SelectedIndex = 0;
+            if (AppSeasonService.Instance.IsAuto)
+            {
+                SeasonComboBox.SelectedIndex = 0;
+            }
+            else
+            {
+                Season? currentSeason =
+                    AppSeasonService.Instance.CurrentSeason;
+
+                int index =
+                    currentSeason == null
+                        ? -1
+                        : seasons.FindIndex(
+                            s => s.Id == currentSeason.Id);
+
+                SeasonComboBox.SelectedIndex =
+                    index >= 0
+                        ? index + 1
+                        : 0;
+            }
 
             UpdateSeasonInfo();
         }
@@ -128,14 +183,13 @@ public partial class SettingsView : UserControl
 
         if (SeasonComboBox.SelectedIndex == 0)
         {
-            Season? detectedSeason =
-                AppSeasonService.Instance.CurrentSeason;
+            Season detectedSeason =
+                SeasonService.GetAutomaticallyDetectedSeason(
+                    seasons,
+                    DateTime.Now);
 
-            if (detectedSeason != null)
-            {
-                AppSeasonService.Instance
-                    .SetAutomaticSeason(detectedSeason);
-            }
+            AppSeasonService.Instance
+                .SetAutomaticSeason(detectedSeason);
 
             UpdateSeasonInfo();
 

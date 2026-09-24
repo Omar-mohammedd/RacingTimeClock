@@ -213,3 +213,4 @@ public class RacerDisplayItem
     public string CategoryDisplay { get; set; } =
         string.Empty;
 }
+

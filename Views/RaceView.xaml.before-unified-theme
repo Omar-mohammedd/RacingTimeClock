@@ -10,7 +10,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Margin="30,24,30,18">
+        <Grid Grid.Row="0" Margin="40,30,40,20">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -21,12 +21,12 @@
 
                 <TextBlock x:Name="RaceTitleText"
                            Text="1000m Race"
-                           FontSize="28"
+                           FontSize="32"
                            FontWeight="Bold"
                            Foreground="{DynamicResource TextPrimaryBrush}"/>
 
                 <TextBlock x:Name="RaceInfoText"
-                           FontSize="13"
+                           FontSize="15"
                            Foreground="{DynamicResource TextSecondaryBrush}"
                            Margin="0,5,0,0"/>
 
@@ -36,7 +36,7 @@
                         HorizontalAlignment="Right">
 
                 <TextBlock Text="RACE TIME"
-                           FontSize="13"
+                           FontSize="14"
                            FontWeight="SemiBold"
                            Foreground="{DynamicResource TextSecondaryBrush}"
                            HorizontalAlignment="Right"/>
@@ -53,7 +53,7 @@
         </Grid>
 
         <Grid Grid.Row="1"
-              Margin="30,0,30,30">
+              Margin="40,0,40,40">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -63,13 +63,13 @@
 
             <Border Grid.Row="0"
                     Background="{DynamicResource SurfaceBrush}"
-                    CornerRadius="10"
+                    CornerRadius="8"
                     Padding="20"
                     Margin="0,0,0,15">
 
                 <TextBlock x:Name="StatusText"
                            Text="PRESS SPACE TO START"
-                           FontSize="20"
+                           FontSize="22"
                            FontWeight="Bold"
                            Foreground="{DynamicResource TextPrimaryBrush}"
                            HorizontalAlignment="Center"/>
@@ -97,12 +97,12 @@
                         Click="SaveRaceButton_Click"/>
 
                 <Border Background="{DynamicResource AccentBrush}"
-                        CornerRadius="10"
+                        CornerRadius="8"
                         Padding="15">
 
                     <TextBlock Text="SPACE = START    |    1-9 = FINISH RACER"
                                Foreground="White"
-                               FontSize="13"
+                               FontSize="15"
                                HorizontalAlignment="Center"/>
 
                 </Border>
@@ -114,5 +114,4 @@
     </Grid>
 
 </UserControl>
-
 

@@ -13,6 +13,15 @@ public enum ThemeMode
     System
 }
 
+public enum AccentColor
+{
+    Red,
+    Blue,
+    Green,
+    Purple,
+    Orange
+}
+
 public static class ThemeService
 {
     private static readonly string SettingsDirectory =
@@ -24,18 +33,31 @@ public static class ThemeService
     private static readonly string ThemeFile =
         Path.Combine(SettingsDirectory, "theme.txt");
 
+    private static readonly string AccentFile =
+        Path.Combine(SettingsDirectory, "accent.txt");
+
     public static ThemeMode CurrentMode { get; private set; } =
         ThemeMode.System;
+
+    public static AccentColor CurrentAccent { get; private set; } =
+        AccentColor.Red;
 
     public static void Initialize()
     {
         ThemeMode mode = LoadThemeMode();
-        Apply(mode);
+        AccentColor accent = LoadAccentColor();
+
+        Apply(mode, accent);
     }
 
-    public static void Apply(ThemeMode mode)
+    public static void Apply(
+        ThemeMode mode,
+        AccentColor? accent = null)
     {
         CurrentMode = mode;
+
+        if (accent.HasValue)
+            CurrentAccent = accent.Value;
 
         bool dark =
             mode == ThemeMode.Dark ||
@@ -66,10 +88,16 @@ public static class ThemeService
             CreateBrush(dark ? "#343A40" : "#D9DDE2");
 
         resources["AccentBrush"] =
-            CreateBrush("#CE1126");
+            CreateBrush(GetAccentHex(CurrentAccent));
 
         resources["AccentHoverBrush"] =
-            CreateBrush("#E31B32");
+            CreateBrush(GetAccentHoverHex(CurrentAccent));
+
+        resources["AccentSoftBrush"] =
+            CreateBrush(
+                GetAccentSoftHex(
+                    CurrentAccent,
+                    dark));
 
         resources["GoldBrush"] =
             CreateBrush("#E5B93F");
@@ -78,21 +106,103 @@ public static class ThemeService
             CreateBrush("#FFFFFF");
 
         resources["ButtonSecondaryBrush"] =
-            CreateBrush(dark ? "#2A3035" : "#E7EAEE");
+            CreateBrush(
+                dark ? "#2A3035" : "#E7EAEE");
 
         resources["ButtonSecondaryTextBrush"] =
-            CreateBrush(dark ? "#F1F3F4" : "#20232A");
+            CreateBrush(
+                dark ? "#F1F3F4" : "#20232A");
 
         resources["ButtonGlowColor"] =
-            CreateColor(dark ? "#CE1126" : "#CE1126");
+            CreateColor("#000000");
+
+        resources["ButtonShadowColor"] =
+            CreateColor("#000000");
 
         resources["DangerBrush"] =
-            CreateBrush("#C62828");
+            CreateBrush(
+                dark ? "#E05252" : "#C62828");
 
         resources["SuccessBrush"] =
-            CreateBrush("#00844A");
+            CreateBrush(
+                dark ? "#29B978" : "#00844A");
+
+        resources["SidebarBackgroundBrush"] =
+            CreateBrush(
+                dark ? "#0C0F11" : "#101820");
+
+        resources["SidebarHoverBrush"] =
+            CreateBrush(
+                dark ? "#20272C" : "#1F2A33");
+
+        resources["SidebarTextBrush"] =
+            CreateBrush("#AEB6C0");
+
+        resources["SidebarTextHoverBrush"] =
+            CreateBrush("#FFFFFF");
 
         SaveThemeMode(mode);
+        SaveAccentColor(CurrentAccent);
+    }
+
+    public static void SetAccent(
+        AccentColor accent)
+    {
+        Apply(
+            CurrentMode,
+            accent);
+    }
+
+    public static string GetAccentHex(
+        AccentColor accent)
+    {
+        return accent switch
+        {
+            AccentColor.Blue => "#2878D0",
+            AccentColor.Green => "#16845A",
+            AccentColor.Purple => "#7856C7",
+            AccentColor.Orange => "#D97720",
+            _ => "#CE1126"
+        };
+    }
+
+    private static string GetAccentHoverHex(
+        AccentColor accent)
+    {
+        return accent switch
+        {
+            AccentColor.Blue => "#3489E5",
+            AccentColor.Green => "#1D9A6A",
+            AccentColor.Purple => "#8968D8",
+            AccentColor.Orange => "#E6872F",
+            _ => "#E31B32"
+        };
+    }
+
+    private static string GetAccentSoftHex(
+        AccentColor accent,
+        bool dark)
+    {
+        if (dark)
+        {
+            return accent switch
+            {
+                AccentColor.Blue => "#182B40",
+                AccentColor.Green => "#153027",
+                AccentColor.Purple => "#28203D",
+                AccentColor.Orange => "#392717",
+                _ => "#3A171D"
+            };
+        }
+
+        return accent switch
+        {
+            AccentColor.Blue => "#EAF3FF",
+            AccentColor.Green => "#E9F6F0",
+            AccentColor.Purple => "#F1ECFF",
+            AccentColor.Orange => "#FFF2E5",
+            _ => "#FFF0EC"
+        };
     }
 
     private static bool IsSystemDark()
@@ -140,15 +250,59 @@ public static class ThemeService
         return ThemeMode.System;
     }
 
-    private static void SaveThemeMode(ThemeMode mode)
+    private static AccentColor LoadAccentColor()
     {
         try
         {
-            Directory.CreateDirectory(SettingsDirectory);
+            if (!File.Exists(AccentFile))
+                return AccentColor.Red;
+
+            string value =
+                File.ReadAllText(AccentFile).Trim();
+
+            if (Enum.TryParse(
+                    value,
+                    true,
+                    out AccentColor accent))
+            {
+                return accent;
+            }
+        }
+        catch
+        {
+        }
+
+        return AccentColor.Red;
+    }
+
+    private static void SaveThemeMode(
+        ThemeMode mode)
+    {
+        try
+        {
+            Directory.CreateDirectory(
+                SettingsDirectory);
 
             File.WriteAllText(
                 ThemeFile,
                 mode.ToString());
+        }
+        catch
+        {
+        }
+    }
+
+    private static void SaveAccentColor(
+        AccentColor accent)
+    {
+        try
+        {
+            Directory.CreateDirectory(
+                SettingsDirectory);
+
+            File.WriteAllText(
+                AccentFile,
+                accent.ToString());
         }
         catch
         {

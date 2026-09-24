@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using RacingTimeClock.Services;
 
 namespace RacingTimeClock;
@@ -23,13 +24,19 @@ public partial class App : Application
                 await databaseService.GetSeasonsAsync();
 
             Models.Season detectedSeason =
-                SeasonService
-                    .GetAutomaticallyDetectedSeason(
-                        seasons,
-                        DateTime.Now);
+                SeasonService.GetAutomaticallyDetectedSeason(
+                    seasons,
+                    DateTime.Now);
 
             AppSeasonService.Instance
-                .SetSeason(detectedSeason);
+                .SetAutomaticSeason(detectedSeason);
+
+            MainWindow mainWindow =
+                new MainWindow();
+
+            MainWindow = mainWindow;
+
+            mainWindow.Show();
         }
         catch (Exception ex)
         {
@@ -43,6 +50,3 @@ public partial class App : Application
         }
     }
 }
-
-
-

@@ -15,7 +15,7 @@
         <Setter Property="HorizontalContentAlignment" Value="Left"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Foreground"
-                Value="{DynamicResource TextPrimaryBrush}"/>
+                Value="{DynamicResource AccentHoverBrush}"/>
         <Setter Property="Background"
                 Value="{DynamicResource SurfaceBrush}"/>
         <Setter Property="BorderBrush"
@@ -78,19 +78,19 @@
 
                                                 <!-- Arrow -->
                                                 <Border
-                                                    Width="32"
-                                                    Height="32"
+                                                    Width="22"
+                                                    Height="22"
                                                     HorizontalAlignment="Right"
                                                     VerticalAlignment="Center"
-                                                    Margin="0,0,5,0"
+                                                    Margin="0,0,3,0"
                                                     Background="{DynamicResource SurfaceSecondaryBrush}"
-                                                    CornerRadius="7">
+                                                    CornerRadius="6">
 
                                                     <Path
-                                                        Data="M 0 0 L 8 0 L 4 5 Z"
+                                                        Data="M 0 0 L 7 0 L 3.5 4 Z"
                                                         Fill="{DynamicResource AccentBrush}"
-                                                        Width="8"
-                                                        Height="5"
+                                                        Width="7"
+                                                        Height="4"
                                                         Stretch="Fill"
                                                         HorizontalAlignment="Center"
                                                         VerticalAlignment="Center"/>
@@ -131,9 +131,9 @@
                                 <Border.Effect>
                                     <DropShadowEffect
                                         Color="#000000"
-                                        BlurRadius="16"
-                                        ShadowDepth="4"
-                                        Opacity="0.25"/>
+                                        BlurRadius="12"
+                                        ShadowDepth="3"
+                                        Opacity="0.20"/>
                                 </Border.Effect>
 
                                 <ScrollViewer
@@ -211,7 +211,7 @@
         <Setter Property="Background"
                 Value="{DynamicResource SurfaceBrush}"/>
         <Setter Property="Foreground"
-                Value="{DynamicResource TextPrimaryBrush}"/>
+                Value="{DynamicResource AccentHoverBrush}"/>
 
         <Setter Property="Template">
             <Setter.Value>
@@ -256,7 +256,7 @@
 
                             <Setter TargetName="ItemBorder"
                                     Property="Background"
-                                    Value="{DynamicResource TextPrimaryBrush}"/>
+                                    Value="{DynamicResource AccentHoverBrush}"/>
 
                             <Setter TargetName="ItemContent"
                                     Property="TextElement.Foreground"
@@ -288,7 +288,7 @@
                 Value="{DynamicResource SurfaceBrush}"/>
 
         <Setter Property="Foreground"
-                Value="{DynamicResource TextPrimaryBrush}"/>
+                Value="{DynamicResource AccentHoverBrush}"/>
 
         <Setter Property="BorderBrush"
                 Value="{DynamicResource BorderBrush}"/>
@@ -312,4 +312,10 @@
            BasedOn="{StaticResource ModernTextBoxStyle}"/>
 
 </ResourceDictionary>
+
+
+
+
+
+
 

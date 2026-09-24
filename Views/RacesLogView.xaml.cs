@@ -146,7 +146,7 @@ public partial class RacesLogView : UserControl
         {
             Text = message,
             FontSize = 20,
-            Foreground = Brushes.Gray,
+            Foreground = (Brush)FindResource("TextSecondaryBrush"),
             HorizontalAlignment =
                 HorizontalAlignment.Center,
             Margin =
@@ -160,7 +160,7 @@ public partial class RacesLogView : UserControl
     {
         Border row = new Border
         {
-            Background = Brushes.White,
+            Background = (Brush)FindResource("SurfaceBrush"),
             CornerRadius =
                 new CornerRadius(8),
             Padding =
@@ -217,11 +217,7 @@ public partial class RacesLogView : UserControl
             FontWeight =
                 FontWeights.SemiBold,
             Foreground =
-                new SolidColorBrush(
-                    Color.FromRgb(
-                        32,
-                        35,
-                        42))
+                (Brush)FindResource("TextPrimaryBrush")
         };
 
         Grid.SetColumn(dateText, 0);
@@ -233,11 +229,7 @@ public partial class RacesLogView : UserControl
             FontWeight =
                 FontWeights.SemiBold,
             Foreground =
-                new SolidColorBrush(
-                    Color.FromRgb(
-                        32,
-                        35,
-                        42))
+                (Brush)FindResource("TextPrimaryBrush")
         };
 
         Grid.SetColumn(raceText, 1);
@@ -257,11 +249,7 @@ public partial class RacesLogView : UserControl
             FontWeight =
                 FontWeights.SemiBold,
             Foreground =
-                new SolidColorBrush(
-                    Color.FromRgb(
-                        32,
-                        35,
-                        42))
+                (Brush)FindResource("TextPrimaryBrush")
         };
 
         Grid.SetColumn(winnerText, 2);
@@ -279,11 +267,7 @@ public partial class RacesLogView : UserControl
             FontWeight =
                 FontWeights.Bold,
             Foreground =
-                new SolidColorBrush(
-                    Color.FromRgb(
-                        0,
-                        100,
-                        180))
+                (Brush)FindResource("AccentBrush")
         };
 
         Grid.SetColumn(timeText, 3);
@@ -326,3 +310,5 @@ public partial class RacesLogView : UserControl
         }
     }
 }
+
+

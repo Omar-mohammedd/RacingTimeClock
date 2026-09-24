@@ -4,47 +4,57 @@
              Focusable="True">
 
     <Grid Background="{DynamicResource PageBackgroundBrush}">
+
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" Margin="40,32,40,24">
+        <Grid Grid.Row="0" Margin="30,24,30,18">
+
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
             <StackPanel>
+
                 <TextBlock x:Name="RaceTitleText"
                            Text="1000m Race"
-                           FontSize="32"
+                           FontSize="28"
                            FontWeight="Bold"
                            Foreground="{DynamicResource TextPrimaryBrush}"/>
+
                 <TextBlock x:Name="RaceInfoText"
-                           FontSize="15"
+                           FontSize="13"
                            Foreground="{DynamicResource TextSecondaryBrush}"
-                           Margin="0,6,0,0"/>
+                           Margin="0,5,0,0"/>
+
             </StackPanel>
 
             <StackPanel Grid.Column="1"
                         HorizontalAlignment="Right">
+
                 <TextBlock Text="RACE TIME"
-                           FontSize="11"
+                           FontSize="13"
                            FontWeight="SemiBold"
                            Foreground="{DynamicResource TextSecondaryBrush}"
                            HorizontalAlignment="Right"/>
+
                 <TextBlock x:Name="TimerText"
                            Text="00:00.000"
-                           FontSize="40"
+                           FontSize="42"
                            FontWeight="Bold"
                            Foreground="{DynamicResource TextPrimaryBrush}"
-                           HorizontalAlignment="Right"
-                           Margin="0,2,0,0"/>
+                           HorizontalAlignment="Right"/>
+
             </StackPanel>
+
         </Grid>
 
-        <Grid Grid.Row="1" Margin="40,0,40,36">
+        <Grid Grid.Row="1"
+              Margin="30,0,30,30">
+
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -53,42 +63,60 @@
 
             <Border Grid.Row="0"
                     Background="{DynamicResource SurfaceBrush}"
-                    BorderBrush="{DynamicResource BorderBrush}"
-                    BorderThickness="1"
                     CornerRadius="10"
-                    Padding="18"
-                    Margin="0,0,0,14">
+                    Padding="22"
+                    Margin="0,0,0,15">
+
                 <TextBlock x:Name="StatusText"
                            Text="PRESS SPACE TO START"
                            FontSize="20"
                            FontWeight="Bold"
                            Foreground="{DynamicResource TextPrimaryBrush}"
                            HorizontalAlignment="Center"/>
+
             </Border>
 
             <ScrollViewer Grid.Row="1"
                           VerticalScrollBarVisibility="Auto">
+
                 <StackPanel x:Name="RacersPanel"/>
+
             </ScrollViewer>
 
-            <StackPanel Grid.Row="2" Margin="0,14,0,0">
+            <StackPanel Grid.Row="2">
+
                 <Button x:Name="SaveRaceButton"
                         Content="SAVE RACE"
-                        Width="180"
-                        Height="44"
+                        Width="200"
+                        Height="42"
                         HorizontalAlignment="Center"
-                        Margin="0,0,0,10"
+                        Margin="0,15,0,10"
+                        FontSize="13"
+                        FontWeight="Bold"
                         Visibility="Collapsed"
                         Click="SaveRaceButton_Click"/>
+
                 <Border Background="{DynamicResource AccentBrush}"
                         CornerRadius="10"
-                        Padding="14">
+                        Padding="15">
+
                     <TextBlock Text="SPACE = START    |    1-9 = FINISH RACER"
                                Foreground="White"
                                FontSize="13"
                                HorizontalAlignment="Center"/>
+
                 </Border>
+
             </StackPanel>
+
         </Grid>
+
     </Grid>
+
 </UserControl>
+
+
+
+
+
+

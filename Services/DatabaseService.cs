@@ -138,10 +138,7 @@ public class DatabaseService
 
         await db.Database.EnsureCreatedAsync();
 
-        return await db.Racers
-            .Where(r => r.IsActive)
-            .OrderBy(r => r.Name)
-            .ToListAsync();
+        return await db.Racers.OrderBy(r => r.Name).ToListAsync();
     }
 
     public async Task<List<Season>> GetSeasonsAsync()
@@ -172,4 +169,5 @@ public class DatabaseService
                      s.IsActive);
     }
 }
+
 

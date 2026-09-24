@@ -6,21 +6,20 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Header -->
+        <!-- PAGE HEADER -->
 
         <Grid Grid.Row="0"
               Margin="30,24,30,18">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="220"/>
+                <ColumnDefinition Width="280"/>
             </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="0">
+            <StackPanel>
 
                 <TextBlock Text="Races Log"
                            FontSize="28"
@@ -30,80 +29,161 @@
                 <TextBlock Text="Previously saved races."
                            FontSize="13"
                            Foreground="{DynamicResource TextSecondaryBrush}"
-                           Margin="0,5,0,0"/>
+                           Margin="0,3,0,0"/>
 
             </StackPanel>
 
             <StackPanel Grid.Column="1">
 
                 <TextBlock Text="SEASON"
-                           FontSize="12"
-                           FontWeight="Bold"
+                           FontSize="10"
+                           FontWeight="SemiBold"
                            Foreground="{DynamicResource TextSecondaryBrush}"
                            Margin="0,0,0,5"/>
 
                 <ComboBox x:Name="SeasonComboBox"
                           Height="42"
-                          FontSize="13"
-                          DisplayMemberPath="Name"
-                          SelectionChanged="SeasonComboBox_SelectionChanged"/>
+                          SelectionChanged="SeasonComboBox_SelectionChanged"
+                          TextSearch.TextPath="Name">
+
+                    <ComboBox.ItemTemplate>
+
+                        <DataTemplate>
+
+                            <TextBlock Text="{Binding Name}"
+                                       FontSize="13"
+                                       Foreground="{DynamicResource TextPrimaryBrush}"
+                                       VerticalAlignment="Center"/>
+
+                        </DataTemplate>
+
+                    </ComboBox.ItemTemplate>
+
+                </ComboBox>
 
             </StackPanel>
 
         </Grid>
 
-        <!-- Column Header -->
+        <!-- COMPLETE TABLE -->
 
         <Border Grid.Row="1"
+                Margin="30,0,30,30"
                 Background="{DynamicResource SurfaceBrush}"
-                CornerRadius="10"
-                Margin="40,0,40,15"
-                Padding="15">
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="1"
+                CornerRadius="10">
 
             <Grid>
 
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1.5*"/>
-                    <ColumnDefinition Width="1.2*"/>
-                    <ColumnDefinition Width="1.5*"/>
-                    <ColumnDefinition Width="1.2*"/>
-                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="38"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-                <TextBlock Text="DATE"
-                           FontWeight="Bold"
-                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+                <!-- TABLE HEADER -->
 
-                <TextBlock Grid.Column="1"
-                           Text="RACE"
-                           FontWeight="Bold"
-                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+                <Border Grid.Row="0"
+                        Background="{DynamicResource SurfaceSecondaryBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="0,0,0,1">
 
-                <TextBlock Grid.Column="2"
-                           Text="WINNER"
-                           FontWeight="Bold"
-                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    <Grid>
 
-                <TextBlock Grid.Column="3"
-                           Text="TIME"
-                           FontWeight="Bold"
-                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="0">
+                            <TextBlock Text="RACE DISTANCE"
+                                       FontSize="9"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+
+                        <Border Grid.Column="1"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="0">
+                            <TextBlock Text="AGE CATEGORY"
+                                       FontSize="9"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+
+                        <Border Grid.Column="2"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="0">
+                            <TextBlock Text="WINNER"
+                                       FontSize="9"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+
+                        <Border Grid.Column="3"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="0">
+                            <TextBlock Text="TIME"
+                                       FontSize="9"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+
+                        <Border Grid.Column="4"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="0">
+                            <TextBlock Text="SEASON"
+                                       FontSize="9"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+
+                        <Border Grid.Column="5">
+                            <TextBlock Text="COMPETITION"
+                                       FontSize="9"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+
+                    </Grid>
+
+                </Border>
+
+                <!-- TABLE BODY -->
+
+                <ScrollViewer Grid.Row="1"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+
+                    <StackPanel x:Name="RacesPanel"/>
+
+                </ScrollViewer>
 
             </Grid>
 
         </Border>
 
-        <!-- Results -->
-
-        <ScrollViewer Grid.Row="2"
-                      VerticalScrollBarVisibility="Auto"
-                      Margin="30,0,30,30">
-
-            <StackPanel x:Name="RacesPanel"/>
-
-        </ScrollViewer>
-
     </Grid>
 
 </UserControl>
+
 
 

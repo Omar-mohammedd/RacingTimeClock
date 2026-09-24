@@ -23,6 +23,7 @@ public partial class RacesLogView : UserControl
     public RacesLogView()
     {
         InitializeComponent();
+
         Loaded += RacesLogView_Loaded;
     }
 
@@ -57,17 +58,20 @@ public partial class RacesLogView : UserControl
                         s => s.Id == currentSeason.Id);
 
                 if (matchingSeason != null)
+                {
                     SeasonComboBox.SelectedItem =
                         matchingSeason;
+                }
             }
 
             if (SeasonComboBox.SelectedItem == null &&
                 seasons.Count > 0)
             {
                 Season? newestSeason =
-                    seasons.OrderByDescending(
-                        s => s.StartYear)
-                    .FirstOrDefault();
+                    seasons
+                        .OrderByDescending(
+                            s => s.StartYear)
+                        .FirstOrDefault();
 
                 SeasonComboBox.SelectedItem =
                     newestSeason;
@@ -93,8 +97,10 @@ public partial class RacesLogView : UserControl
         object sender,
         SelectionChangedEventArgs e)
     {
-        if (!isLoading)
-            RefreshRaceList();
+        if (isLoading)
+            return;
+
+        RefreshRaceList();
     }
 
     private void RefreshRaceList()
@@ -104,7 +110,9 @@ public partial class RacesLogView : UserControl
         if (SeasonComboBox.SelectedItem
             is not Season selectedSeason)
         {
-            ShowEmptyMessage("No season selected.");
+            ShowEmptyMessage(
+                "No season selected.");
+
             return;
         }
 
@@ -126,18 +134,19 @@ public partial class RacesLogView : UserControl
         }
 
         foreach (Race race in races)
+        {
             AddRaceRow(race);
+        }
     }
 
-    private void ShowEmptyMessage(string message)
+    private void ShowEmptyMessage(
+        string message)
     {
         TextBlock emptyText = new TextBlock
         {
             Text = message,
-            FontSize = 13,
-            Foreground =
-                (Brush)FindResource(
-                    "TextSecondaryBrush"),
+            FontSize = 14,
+            Foreground = (Brush)FindResource("TextSecondaryBrush"),
             HorizontalAlignment =
                 HorizontalAlignment.Center,
             Margin =
@@ -149,48 +158,16 @@ public partial class RacesLogView : UserControl
 
     private void AddRaceRow(Race race)
     {
-        RacerResult? winner =
-            race.Results
-                .FirstOrDefault(
-                    r => r.Position == 1);
-
-        string ageCategory = string.Empty;
-
-        if (winner?.Racer != null &&
-            race.Season != null)
-        {
-            ageCategory =
-                SeasonService.GetCategory(
-                    winner.Racer,
-                    race.Season);
-        }
-
-        string winnerName =
-            winner?.Racer?.Name ?? "Guest";
-
-        string winnerTime =
-            winner == null
-                ? string.Empty
-                : FormatTime(
-                    winner.FinishTime);
-
         Border row = new Border
         {
-            Background =
-                (Brush)FindResource(
-                    "SurfaceBrush"),
-
-            BorderBrush =
-                (Brush)FindResource(
-                    "BorderBrush"),
-
-            BorderThickness =
-                new Thickness(0, 0, 0, 1),
-
-            Height = 44,
-
+            Background = (Brush)FindResource("SurfaceBrush"),
+            CornerRadius =
+                new CornerRadius(10),
+            Padding =
+                new Thickness(16),
+            Margin =
+                new Thickness(0, 0, 0, 8),
             Cursor = Cursors.Hand,
-
             Tag = race
         };
 
@@ -199,107 +176,110 @@ public partial class RacesLogView : UserControl
 
         Grid grid = new Grid();
 
-        for (int i = 0; i < 6; i++)
+        grid.ColumnDefinitions.Add(
+            new ColumnDefinition
+            {
+                Width = new GridLength(
+                    1.5,
+                    GridUnitType.Star)
+            });
+
+        grid.ColumnDefinitions.Add(
+            new ColumnDefinition
+            {
+                Width = new GridLength(
+                    1.2,
+                    GridUnitType.Star)
+            });
+
+        grid.ColumnDefinitions.Add(
+            new ColumnDefinition
+            {
+                Width = new GridLength(
+                    1.5,
+                    GridUnitType.Star)
+            });
+
+        grid.ColumnDefinitions.Add(
+            new ColumnDefinition
+            {
+                Width = new GridLength(
+                    1.2,
+                    GridUnitType.Star)
+            });
+
+        TextBlock dateText = new TextBlock
         {
-            grid.ColumnDefinitions.Add(
-                new ColumnDefinition
-                {
-                    Width =
-                        new GridLength(
-                            1,
-                            GridUnitType.Star)
-                });
-        }
+            Text =
+                race.StartDateTime.ToString(
+                    "dd/MM/yyyy  HH:mm"),
+            FontSize = 14,
+            FontWeight =
+                FontWeights.SemiBold,
+            Foreground =
+                (Brush)FindResource("TextPrimaryBrush")
+        };
 
-        AddCell(
-            grid,
-            race.Distance,
-            0);
+        Grid.SetColumn(dateText, 0);
 
-        AddCell(
-            grid,
-            ageCategory,
-            1,
-            true);
+        TextBlock raceText = new TextBlock
+        {
+            Text = race.Distance,
+            FontSize = 14,
+            FontWeight =
+                FontWeights.SemiBold,
+            Foreground =
+                (Brush)FindResource("TextPrimaryBrush")
+        };
 
-        AddCell(
-            grid,
-            winnerName,
-            2);
+        Grid.SetColumn(raceText, 1);
 
-        AddCell(
-            grid,
-            winnerTime,
-            3,
-            true,
-            true);
+        RacerResult? winner =
+            race.Results
+                .FirstOrDefault(
+                    r => r.Position == 1);
 
-        AddCell(
-            grid,
-            race.Season?.Name ?? string.Empty,
-            4,
-            true);
+        string winnerName =
+            winner?.Racer?.Name ?? "Guest";
 
-        AddCell(
-            grid,
-            string.Empty,
-            5,
-            true,
-            false,
-            true);
+        TextBlock winnerText = new TextBlock
+        {
+            Text = winnerName,
+            FontSize = 14,
+            FontWeight =
+                FontWeights.SemiBold,
+            Foreground =
+                (Brush)FindResource("TextPrimaryBrush")
+        };
+
+        Grid.SetColumn(winnerText, 2);
+
+        string winnerTime =
+            winner == null
+                ? "--"
+                : FormatTime(
+                    winner.FinishTime);
+
+        TextBlock timeText = new TextBlock
+        {
+            Text = winnerTime,
+            FontSize = 14,
+            FontWeight =
+                FontWeights.Bold,
+            Foreground =
+                (Brush)FindResource("AccentBrush")
+        };
+
+        Grid.SetColumn(timeText, 3);
+
+        grid.Children.Add(dateText);
+        grid.Children.Add(raceText);
+        grid.Children.Add(winnerText);
+        grid.Children.Add(timeText);
 
         row.Child = grid;
 
         RacesPanel.Children.Add(row);
-    }
-
-    private void AddCell(
-        Grid grid,
-        string text,
-        int column,
-        bool bold = false,
-        bool accent = false,
-        bool lastColumn = false)
-    {
-        Border cell = new Border
-        {
-            BorderBrush =
-                (Brush)FindResource(
-                    "BorderBrush"),
-
-            BorderThickness = new Thickness(0)
-        };
-
-        TextBlock block = new TextBlock
-        {
-            Text = text,
-
-            FontSize = 11,
-
-            FontWeight =
-                bold || accent
-                    ? FontWeights.SemiBold
-                    : FontWeights.Normal,
-
-            Foreground =
-                accent
-                    ? (Brush)FindResource(
-                        "AccentBrush")
-                    : (Brush)FindResource(
-                        "TextPrimaryBrush"),
-
-            HorizontalAlignment =
-                HorizontalAlignment.Center,
-
-            VerticalAlignment =
-                VerticalAlignment.Center
-        };
-
-        cell.Child = block;
-
-        Grid.SetColumn(cell, column);
-
-        grid.Children.Add(cell);
     }
 
     private static string FormatTime(
@@ -330,6 +310,8 @@ public partial class RacesLogView : UserControl
         }
     }
 }
+
+
 
 
 

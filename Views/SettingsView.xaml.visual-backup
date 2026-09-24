@@ -3,100 +3,135 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="40,32,40,36">
+
+        <StackPanel Margin="30,24,30,24">
 
             <TextBlock Text="Settings"
-                       FontSize="32"
+                       FontSize="28"
                        FontWeight="Bold"
                        Foreground="{DynamicResource TextPrimaryBrush}"/>
+
             <TextBlock Text="Application settings and race configuration."
-                       FontSize="15"
+                       FontSize="13"
                        Foreground="{DynamicResource TextSecondaryBrush}"
-                       Margin="0,6,0,28"/>
+                       Margin="0,6,0,32"/>
+
+
+            <!-- Appearance -->
 
             <Border Background="{DynamicResource SurfaceBrush}"
                     BorderBrush="{DynamicResource BorderBrush}"
                     BorderThickness="1"
                     CornerRadius="10"
                     Padding="24"
-                    MaxWidth="700"
+                    Width="620"
                     HorizontalAlignment="Left"
-                    Margin="0,0,0,18">
+                    Margin="0,0,0,20">
+
                 <StackPanel>
+
                     <TextBlock Text="Appearance"
                                FontSize="20"
                                FontWeight="SemiBold"
                                Foreground="{DynamicResource TextPrimaryBrush}"/>
+
                     <TextBlock Text="Choose how Racing Time Clock should appear."
                                FontSize="13"
                                Foreground="{DynamicResource TextSecondaryBrush}"
-                               Margin="0,6,0,20"/>
+                               Margin="0,6,0,16"/>
 
                     <TextBlock Text="Theme"
                                FontSize="13"
                                FontWeight="SemiBold"
                                Foreground="{DynamicResource TextPrimaryBrush}"
                                Margin="0,0,0,6"/>
+
                     <ComboBox x:Name="ThemeComboBox"
-                              Width="280"
+                              Width="220"
                               HorizontalAlignment="Left"
                               SelectionChanged="ThemeComboBox_SelectionChanged">
+
                         <ComboBoxItem Content="Light"/>
                         <ComboBoxItem Content="Dark"/>
                         <ComboBoxItem Content="System"/>
+
                     </ComboBox>
+
 
                     <TextBlock Text="Accent Color"
                                FontSize="13"
                                FontWeight="SemiBold"
                                Foreground="{DynamicResource TextPrimaryBrush}"
-                               Margin="0,18,0,6"/>
+                               Margin="0,20,0,6"/>
+
                     <TextBlock Text="Choose the primary color used throughout the application."
                                FontSize="13"
                                Foreground="{DynamicResource TextSecondaryBrush}"
-                               Margin="0,0,0,8"
+                               Margin="0,0,0,10"
                                TextWrapping="Wrap"/>
+
                     <ComboBox x:Name="AccentComboBox"
-                              Width="280"
+                              Width="220"
                               HorizontalAlignment="Left"
                               SelectionChanged="AccentComboBox_SelectionChanged">
+
                         <ComboBoxItem Content="Red"/>
                         <ComboBoxItem Content="Blue"/>
                         <ComboBoxItem Content="Green"/>
                         <ComboBoxItem Content="Purple"/>
                         <ComboBoxItem Content="Orange"/>
+
                     </ComboBox>
+
                 </StackPanel>
+
             </Border>
+
+
+            <!-- Season -->
 
             <Border Background="{DynamicResource SurfaceBrush}"
                     BorderBrush="{DynamicResource BorderBrush}"
                     BorderThickness="1"
                     CornerRadius="10"
                     Padding="24"
-                    MaxWidth="700"
+                    Width="620"
                     HorizontalAlignment="Left">
+
                 <StackPanel>
+
                     <TextBlock Text="Current Season"
                                FontSize="20"
                                FontWeight="SemiBold"
                                Foreground="{DynamicResource TextPrimaryBrush}"/>
+
                     <TextBlock Text="The selected season controls racer categories throughout the application."
                                FontSize="13"
                                Foreground="{DynamicResource TextSecondaryBrush}"
-                               Margin="0,6,0,20"
+                               Margin="0,6,0,16"
                                TextWrapping="Wrap"/>
+
                     <ComboBox x:Name="SeasonComboBox"
-                              Width="280"
+                              Width="250"
                               HorizontalAlignment="Left"
                               SelectionChanged="SeasonComboBox_SelectionChanged"/>
+
                     <TextBlock x:Name="SeasonInfoText"
                                FontSize="13"
                                Foreground="{DynamicResource TextSecondaryBrush}"
                                Margin="0,12,0,0"
                                TextWrapping="Wrap"/>
+
                 </StackPanel>
+
             </Border>
+
         </StackPanel>
+
     </ScrollViewer>
+
 </UserControl>
+
+
+
+

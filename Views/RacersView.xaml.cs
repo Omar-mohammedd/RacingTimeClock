@@ -15,15 +15,14 @@ namespace RacingTimeClock.Views;
 
 public partial class RacersView : UserControl
 {
-    private readonly ObservableCollection<RacerDisplayItem> racers =
-        new();
+    private readonly ObservableCollection<RacerDisplayItem> racers = new();
 
     private string selectedCategory = "All";
+    private string selectedGender = "All";
 
     public RacersView()
     {
         InitializeComponent();
-
         Loaded += RacersView_Loaded;
     }
 
@@ -38,8 +37,7 @@ public partial class RacersView : UserControl
     {
         try
         {
-            DatabaseService databaseService =
-                new DatabaseService();
+            DatabaseService databaseService = new();
 
             List<Racer> racerList =
                 await databaseService.GetRacersAsync();
@@ -78,22 +76,21 @@ public partial class RacersView : UserControl
 
     private void ApplyFilters()
     {
-        IEnumerable<RacerDisplayItem> filtered =
-            racers;
+                if (!IsInitialized || SearchTextBox == null || RacersDataGrid == null)
+            return;
+
+IEnumerable<RacerDisplayItem> filtered = racers;
 
         if (!string.Equals(
                 selectedCategory,
                 "All",
                 StringComparison.OrdinalIgnoreCase))
         {
-            string category =
-                selectedCategory.TrimEnd('s');
-
             filtered =
                 filtered.Where(
                     r => string.Equals(
                         r.CategoryDisplay,
-                        category,
+                        selectedCategory.TrimEnd('s'),
                         StringComparison.OrdinalIgnoreCase));
         }
 
@@ -122,6 +119,28 @@ public partial class RacersView : UserControl
             filtered.ToList();
     }
 
+    private void GenderButton_Click(
+        object sender,
+        SelectionChangedEventArgs e)
+    {
+        if (!IsInitialized || GenderTabs == null)
+            return;
+
+        if (GenderTabs.SelectedItem is ListBoxItem item)
+        {
+            selectedGender =
+                item.Content?.ToString() ?? "All";
+
+            ApplyFilters();
+        }
+    }
+    private void SearchBorder_MouseLeftButtonDown(
+        object sender,
+        MouseButtonEventArgs e)
+    {
+        SearchTextBox.Focus();
+        e.Handled = true;
+    }
     private void SearchTextBox_TextChanged(
         object sender,
         TextChangedEventArgs e)
@@ -129,8 +148,7 @@ public partial class RacersView : UserControl
         if (SearchPlaceholder != null)
         {
             SearchPlaceholder.Visibility =
-                string.IsNullOrWhiteSpace(
-                    SearchTextBox.Text)
+                string.IsNullOrWhiteSpace(SearchTextBox.Text)
                     ? Visibility.Visible
                     : Visibility.Collapsed;
         }
@@ -138,31 +156,33 @@ public partial class RacersView : UserControl
         ApplyFilters();
     }
 
+
     private void CategoryButton_Click(
         object sender,
-        RoutedEventArgs e)
+        SelectionChangedEventArgs e)
     {
-        if (sender is not Button button)
+                if (!IsInitialized || CategoryTabs == null)
             return;
 
-        selectedCategory =
-            button.Content?.ToString() ?? "All";
+if (CategoryTabs.SelectedItem is ListBoxItem item)
+        {
+            selectedCategory =
+                item.Content?.ToString() ?? "All";
 
-        ApplyFilters();
+            ApplyFilters();
+        }
     }
 
     private void AddRacerButton_Click(
         object sender,
         RoutedEventArgs e)
     {
-        AddRacerDialog dialog =
-            new AddRacerDialog();
+        AddRacerDialog dialog = new AddRacerDialog
+        {
+            Owner = Window.GetWindow(this)
+        };
 
-        dialog.Owner =
-            Window.GetWindow(this);
-
-        bool? result =
-            dialog.ShowDialog();
+        bool? result = dialog.ShowDialog();
 
         if (result == true)
             _ = LoadRacersAsync();
@@ -172,21 +192,47 @@ public partial class RacersView : UserControl
         object sender,
         MouseButtonEventArgs e)
     {
-        if (RacersDataGrid.SelectedItem
-            is not RacerDisplayItem item)
-            return;
-
-        RacerDetailsDialog dialog =
-            new RacerDetailsDialog(item.Racer.Id);
-
-        dialog.Owner =
-            Window.GetWindow(this);
-
-        dialog.ShowDialog();
-
-        if (dialog.WasDeleted)
+        try
         {
-            await LoadRacersAsync();
+            if (e.ChangedButton != MouseButton.Left ||
+                e.ClickCount < 2)
+            {
+                return;
+            }
+
+            if (RacersDataGrid.SelectedItem
+                is not RacerDisplayItem item)
+            {
+                return;
+            }
+
+            e.Handled = true;
+
+            RacerDetailsDialog dialog =
+                new RacerDetailsDialog(item.Racer.Id)
+                {
+                    Owner = Window.GetWindow(this)
+                };
+
+            await Dispatcher.InvokeAsync(
+                () => dialog.ShowDialog());
+
+            if (dialog.WasDeleted)
+            {
+                await LoadRacersAsync();
+            }
+            else
+            {
+                await LoadRacersAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(
+                $"Could not open racer details.\n\n{ex}",
+                "Racer Details Error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
         }
     }
 }
@@ -212,5 +258,20 @@ public class RacerDisplayItem
 
     public string CategoryDisplay { get; set; } =
         string.Empty;
+
+    public bool IsActive =>
+        Racer.IsActive;
+
+    public string StatusDisplay =>
+        Racer.IsActive
+            ? "Active"
+            : "Not Active";
 }
+
+
+
+
+
+
+
 

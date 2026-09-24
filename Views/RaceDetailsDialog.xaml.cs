@@ -16,9 +16,9 @@ public partial class RaceDetailsDialog : Window
         public int Position { get; set; }
         public string PositionDisplay => Position switch
         {
-            1 => "1st 🥇",
-            2 => "2nd 🥈",
-            3 => "3rd 🥉",
+            1 => "1st",
+            2 => "2nd",
+            3 => "3rd",
             _ => $"{Position}th"
         };
         public string RacerId { get; set; } = string.Empty;
@@ -86,3 +86,4 @@ public partial class RaceDetailsDialog : Window
         Close();
     }
 }
+

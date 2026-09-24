@@ -24,8 +24,8 @@ public partial class MainWindow : Window
         object? sender,
         PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(
-                AppSeasonService.CurrentSeason))
+        if (e.PropertyName ==
+            nameof(AppSeasonService.CurrentSeason))
         {
             UpdateSeasonLabel();
         }
@@ -39,8 +39,34 @@ public partial class MainWindow : Window
                 : "Season";
     }
 
+    private void SetActiveNavigation(
+        string page)
+    {
+        NewRaceNavButton.Tag =
+            page == "NewRace"
+                ? "Active"
+                : null;
+
+        RacersNavButton.Tag =
+            page == "Racers"
+                ? "Active"
+                : null;
+
+        RacesLogNavButton.Tag =
+            page == "RacesLog"
+                ? "Active"
+                : null;
+
+        SettingsNavButton.Tag =
+            page == "Settings"
+                ? "Active"
+                : null;
+    }
+
     private void ShowNewRace()
     {
+        SetActiveNavigation("NewRace");
+
         NewRaceView newRaceView =
             new NewRaceView();
 
@@ -78,6 +104,8 @@ public partial class MainWindow : Window
         object sender,
         RoutedEventArgs e)
     {
+        SetActiveNavigation("Racers");
+
         PageContent.Content =
             new RacersView();
     }
@@ -86,6 +114,8 @@ public partial class MainWindow : Window
         object sender,
         RoutedEventArgs e)
     {
+        SetActiveNavigation("RacesLog");
+
         PageContent.Content =
             new RacesLogView();
     }
@@ -94,6 +124,8 @@ public partial class MainWindow : Window
         object sender,
         RoutedEventArgs e)
     {
+        SetActiveNavigation("Settings");
+
         PageContent.Content =
             new SettingsView();
     }

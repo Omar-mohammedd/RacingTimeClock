@@ -67,12 +67,15 @@
 
         <!-- COMPLETE TABLE -->
 
-        <Border Grid.Row="1"
+        <Border x:Name="RacesLogTableBorder"
+                Grid.Row="1"
                 Margin="30,0,30,30"
                 Background="{DynamicResource SurfaceBrush}"
                 BorderBrush="{DynamicResource BorderBrush}"
                 BorderThickness="1"
-                CornerRadius="10">
+                CornerRadius="10"
+                ClipToBounds="True"
+                SizeChanged="RacesLogTableBorder_SizeChanged">
 
             <Grid>
 
@@ -184,6 +187,8 @@
     </Grid>
 
 </UserControl>
+
+
 
 
 

@@ -19,8 +19,23 @@ public partial class RaceDetailsDialog : Window
             1 => "1st",
             2 => "2nd",
             3 => "3rd",
-            _ => $"{Position}th"
+            _ => GetOrdinal(Position)
         };
+        private static string GetOrdinal(int position)
+        {
+            int lastTwo = position % 100;
+
+            if (lastTwo is >= 11 and <= 13)
+                return $"{position}th";
+
+            return (position % 10) switch
+            {
+                1 => $"{position}st",
+                2 => $"{position}nd",
+                3 => $"{position}rd",
+                _ => $"{position}th"
+            };
+        }
         public string RacerId { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public TimeSpan FinishTime { get; set; }
@@ -32,8 +47,27 @@ public partial class RaceDetailsDialog : Window
         InitializeComponent();
         raceId = selectedRaceId;
         Loaded += RaceDetailsDialog_Loaded;
+        SizeChanged += (_, _) => UpdateLeaderboardDataGridClip();
     }
 
+    private void UpdateLeaderboardDataGridClip()
+    {
+        if (LeaderboardDataGrid.ActualWidth <= 0 ||
+            LeaderboardDataGrid.ActualHeight <= 0)
+        {
+            return;
+        }
+
+        LeaderboardDataGrid.Clip =
+            new System.Windows.Media.RectangleGeometry(
+                new System.Windows.Rect(
+                    0,
+                    0,
+                    LeaderboardDataGrid.ActualWidth,
+                    LeaderboardDataGrid.ActualHeight),
+                10,
+                10);
+    }
     private async void RaceDetailsDialog_Loaded(object sender, RoutedEventArgs e)
     {
         await LoadRaceDetailsAsync();
@@ -86,4 +120,6 @@ public partial class RaceDetailsDialog : Window
         Close();
     }
 }
+
+
 

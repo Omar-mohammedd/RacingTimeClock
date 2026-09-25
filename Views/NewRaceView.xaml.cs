@@ -40,6 +40,7 @@ public partial class NewRaceView : UserControl
     public event Action<
         string,
         string,
+        string,
         int,
         int,
         List<RacerSelectionItem>>? RaceStarted;
@@ -918,14 +919,21 @@ public partial class NewRaceView : UserControl
                     })
                 .ToList();
 
+        string competitionType =
+            (CompetitionComboBox.SelectedItem
+                as ComboBoxItem)?.Content?.ToString()
+            ?? string.Empty;
+
         RaceStarted?.Invoke(
             selectedDistance,
             selectedRaceType,
+            competitionType,
             selectedRacerCount,
             season.Id,
             selections);
     }
 }
+
 
 
 

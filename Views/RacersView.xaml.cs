@@ -1,13 +1,13 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using Microsoft.EntityFrameworkCore;
-using RacingTimeClock.Data;
 using RacingTimeClock.Models;
 using RacingTimeClock.Services;
 
@@ -17,8 +17,13 @@ public partial class RacersView : UserControl
 {
     private readonly ObservableCollection<RacerDisplayItem> racers = new();
 
-    private string selectedCategory = "All";
-    private string selectedGender = "All";
+    private RacerFilterCriteria filterCriteria = new();
+
+    private string sortProperty = nameof(RacerDisplayItem.Name);
+    private ListSortDirection sortDirection = ListSortDirection.Ascending;
+
+    private ScrollViewer? racerScrollViewer;
+    private bool updatingRacerScrollBar;
 
     public RacersView()
     {
@@ -76,26 +81,17 @@ public partial class RacersView : UserControl
 
     private void ApplyFilters()
     {
-                if (!IsInitialized || SearchTextBox == null || RacersDataGrid == null)
-            return;
-
-IEnumerable<RacerDisplayItem> filtered = racers;
-
-        if (!string.Equals(
-                selectedCategory,
-                "All",
-                StringComparison.OrdinalIgnoreCase))
+        if (!IsInitialized ||
+            SearchTextBox == null ||
+            RacersDataGrid == null)
         {
-            filtered =
-                filtered.Where(
-                    r => string.Equals(
-                        r.CategoryDisplay,
-                        selectedCategory.TrimEnd('s'),
-                        StringComparison.OrdinalIgnoreCase));
+            return;
         }
 
+        IEnumerable<RacerDisplayItem> filtered = racers;
+
         string search =
-            SearchTextBox?.Text?.Trim() ?? string.Empty;
+            SearchTextBox.Text?.Trim() ?? string.Empty;
 
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -115,25 +111,467 @@ IEnumerable<RacerDisplayItem> filtered = racers;
                             StringComparison.OrdinalIgnoreCase));
         }
 
+        if (!string.Equals(
+                filterCriteria.Gender,
+                "All",
+                StringComparison.OrdinalIgnoreCase))
+        {
+            filtered =
+                filtered.Where(
+                    r => string.Equals(
+                        r.GenderDisplay,
+                        filterCriteria.Gender,
+                        StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (!string.Equals(
+                filterCriteria.Category,
+                "All",
+                StringComparison.OrdinalIgnoreCase))
+        {
+            filtered =
+                filtered.Where(
+                    r => string.Equals(
+                        r.CategoryDisplay,
+                        filterCriteria.Category,
+                        StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (!string.Equals(
+                filterCriteria.Status,
+                "All",
+                StringComparison.OrdinalIgnoreCase))
+        {
+            bool active =
+                string.Equals(
+                    filterCriteria.Status,
+                    "Active",
+                    StringComparison.OrdinalIgnoreCase);
+
+            filtered =
+                filtered.Where(
+                    r => r.IsActive == active);
+        }
+
+        if (filterCriteria.MinBirthYear.HasValue)
+        {
+            int minimumBirthYear =
+                filterCriteria.MinBirthYear.Value;
+
+            filtered =
+                filtered.Where(
+                    r =>
+                        r.BirthYear >= minimumBirthYear);
+        }
+
+        if (filterCriteria.MaxBirthYear.HasValue)
+        {
+            int maximumBirthYear =
+                filterCriteria.MaxBirthYear.Value;
+
+            filtered =
+                filtered.Where(
+                    r =>
+                        r.BirthYear <= maximumBirthYear);
+        }
+
+        if (filterCriteria.MinRacingNumber.HasValue)
+        {
+            int minimum =
+                filterCriteria.MinRacingNumber.Value;
+
+            filtered =
+                filtered.Where(
+                    r =>
+                        TryGetRacingNumber(
+                            r,
+                            out int number)
+                        &&
+                        number >= minimum);
+        }
+
+        if (filterCriteria.MaxRacingNumber.HasValue)
+        {
+            int maximum =
+                filterCriteria.MaxRacingNumber.Value;
+
+            filtered =
+                filtered.Where(
+                    r =>
+                        TryGetRacingNumber(
+                            r,
+                            out int number)
+                        &&
+                        number <= maximum);
+        }
+
+        filtered =
+            SortRacers(filtered);
+
         RacersDataGrid.ItemsSource =
             filtered.ToList();
+        UpdateRacersTableHeight();
+
+        Dispatcher.BeginInvoke(
+            new Action(UpdateRacersTableHeight),
+            System.Windows.Threading.DispatcherPriority.Render);
+
+        UpdateRacersTableHeight();
+UpdateFilterButtonText();
+        UpdateSortIndicators();
     }
 
-    private void GenderButton_Click(
-        object sender,
-        SelectionChangedEventArgs e)
+    private IEnumerable<RacerDisplayItem> SortRacers(
+        IEnumerable<RacerDisplayItem> source)
     {
-        if (!IsInitialized || GenderTabs == null)
+        return sortProperty switch
+        {
+            nameof(RacerDisplayItem.RacingNumber) =>
+                sortDirection == ListSortDirection.Ascending
+                    ? source.OrderBy(
+                        r =>
+                            TryGetRacingNumber(
+                                r,
+                                out int n)
+                                ? n
+                                : int.MaxValue)
+                    : source.OrderByDescending(
+                        r =>
+                            TryGetRacingNumber(
+                                r,
+                                out int n)
+                                ? n
+                                : int.MinValue),
+
+            nameof(RacerDisplayItem.GenderDisplay) =>
+                sortDirection == ListSortDirection.Ascending
+                    ? source.OrderBy(r => r.GenderDisplay)
+                    : source.OrderByDescending(r => r.GenderDisplay),
+
+            nameof(RacerDisplayItem.BirthYear) =>
+                sortDirection == ListSortDirection.Ascending
+                    ? source.OrderBy(r => r.BirthYear)
+                    : source.OrderByDescending(r => r.BirthYear),
+
+            nameof(RacerDisplayItem.CategoryDisplay) =>
+                sortDirection == ListSortDirection.Ascending
+                    ? source.OrderBy(r => r.CategoryDisplay)
+                    : source.OrderByDescending(r => r.CategoryDisplay),
+
+            nameof(RacerDisplayItem.StatusDisplay) =>
+                sortDirection == ListSortDirection.Ascending
+                    ? source.OrderBy(r => r.IsActive)
+                    : source.OrderByDescending(r => r.IsActive),
+
+            _ =>
+                sortDirection == ListSortDirection.Ascending
+                    ? source.OrderBy(r => r.Name)
+                    : source.OrderByDescending(r => r.Name)
+        };
+    }
+
+    private void RacersDataGrid_Sorting(
+        object sender,
+        DataGridSortingEventArgs e)
+    {
+        e.Handled = true;
+
+        string property =
+            e.Column.SortMemberPath;
+
+        if (string.IsNullOrWhiteSpace(property))
             return;
 
-        if (GenderTabs.SelectedItem is ListBoxItem item)
+        if (string.Equals(
+                sortProperty,
+                property,
+                StringComparison.Ordinal))
         {
-            selectedGender =
-                item.Content?.ToString() ?? "All";
+            sortDirection =
+                sortDirection ==
+                    ListSortDirection.Ascending
+                    ? ListSortDirection.Descending
+                    : ListSortDirection.Ascending;
+        }
+        else
+        {
+            sortProperty = property;
+            sortDirection =
+                ListSortDirection.Ascending;
+        }
+
+        ApplyFilters();
+    }
+
+    private void UpdateSortIndicators()
+    {
+        if (RacersDataGrid == null)
+            return;
+
+        foreach (DataGridColumn column
+                 in RacersDataGrid.Columns)
+        {
+            column.SortDirection =
+                string.Equals(
+                    column.SortMemberPath,
+                    sortProperty,
+                    StringComparison.Ordinal)
+                    ? sortDirection
+                    : null;
+        }
+    }
+
+    private void RacersDataGrid_Loaded(
+        object sender,
+        RoutedEventArgs e)
+    {
+
+        racerScrollViewer =
+            FindVisualChild<ScrollViewer>(
+                RacersDataGrid);
+
+        if (racerScrollViewer != null)
+        {
+            racerScrollViewer.ScrollChanged -=
+                RacerScrollViewer_ScrollChanged;
+
+            racerScrollViewer.ScrollChanged +=
+                RacerScrollViewer_ScrollChanged;
+        }
+
+        Dispatcher.BeginInvoke(
+            new Action(UpdateRacerScrollBar),
+            System.Windows.Threading.DispatcherPriority.Loaded);
+    }
+
+    private void RacerScrollViewer_ScrollChanged(
+    object? sender,
+    ScrollChangedEventArgs e)
+{
+    UpdateRacerScrollBar();
+}
+private void RacerScrollBar_ValueChanged(
+        object sender,
+        RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (updatingRacerScrollBar ||
+            racerScrollViewer == null)
+        {
+            return;
+        }
+
+        racerScrollViewer.ScrollToVerticalOffset(
+            e.NewValue);
+    }
+
+    private void RacersDataGrid_SizeChanged(
+    object sender,
+    SizeChangedEventArgs e)
+{
+    UpdateRacersDataGridClip();
+
+    Dispatcher.BeginInvoke(
+        new Action(() =>
+        {
+            UpdateRacersTableHeight();
+            UpdateRacerScrollBar();
+            UpdateRacersDataGridClip();
+        }),
+        System.Windows.Threading.DispatcherPriority.Render);
+}
+private void UpdateRacersTableHeight()
+{
+    if (RacersDataGrid == null ||
+        RacersTableBorder == null)
+    {
+        return;
+    }
+
+    Grid? parentGrid =
+        RacersTableBorder.Parent as Grid;
+
+    if (parentGrid == null ||
+        parentGrid.ActualHeight <= 0)
+    {
+        return;
+    }
+
+    double availableHeight =
+        parentGrid.ActualHeight;
+
+    RacersDataGrid.Height =
+        availableHeight;
+
+    RacersTableBorder.Height =
+        availableHeight;
+
+    RacerScrollBar.Height =
+        Math.Max(
+            1,
+            availableHeight - 50);
+
+    RacersTableBorder.ClipToBounds = true;
+}
+private void UpdateRacerScrollBar()
+    {
+        if (RacerScrollBar == null ||
+            racerScrollViewer == null)
+        {
+            return;
+        }
+
+        double maximum =
+            Math.Max(
+                0,
+                racerScrollViewer.ExtentHeight -
+                racerScrollViewer.ViewportHeight);
+
+        updatingRacerScrollBar = true;
+
+        RacerScrollBar.Maximum = maximum;
+        RacerScrollBar.ViewportSize = Math.Max(1, RacerScrollBar.Maximum / 3.0);
+
+        RacerScrollBar.LargeChange =
+            Math.Max(
+                1,
+                racerScrollViewer.ViewportHeight);
+
+        RacerScrollBar.SmallChange = 1;
+
+        RacerScrollBar.Value =
+            Math.Min(
+                maximum,
+                racerScrollViewer.VerticalOffset);
+
+        RacerScrollBar.Visibility =
+            maximum > 0
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+
+        updatingRacerScrollBar = false;
+    }
+
+    private void UpdateRacersDataGridClip()
+{
+    if (RacersDataGrid.ActualWidth <= 0 ||
+        RacersDataGrid.ActualHeight <= 0)
+    {
+        return;
+    }
+
+    RacersDataGrid.Clip =
+        new System.Windows.Media.RectangleGeometry(
+            new System.Windows.Rect(
+                0,
+                0,
+                RacersDataGrid.ActualWidth,
+                RacersDataGrid.ActualHeight),
+            10,
+            10);
+}
+
+private void RacersDataGrid_PreviewMouseWheel(
+    object sender,
+    MouseWheelEventArgs e)
+{
+    if (racerScrollViewer == null)
+    {
+        return;
+    }
+
+    const double pixelsPerWheelDelta = 0.25;
+
+    double targetOffset =
+        racerScrollViewer.VerticalOffset -
+        (e.Delta * pixelsPerWheelDelta);
+
+    targetOffset =
+        Math.Max(
+            0,
+            Math.Min(
+                racerScrollViewer.ScrollableHeight,
+                targetOffset));
+
+    racerScrollViewer.ScrollToVerticalOffset(
+        targetOffset);
+
+    e.Handled = true;
+}
+private static T? FindVisualChild<T>(
+        DependencyObject? parent)
+        where T : DependencyObject
+    {
+        if (parent == null)
+            return null;
+
+        int childCount =
+            System.Windows.Media.VisualTreeHelper
+                .GetChildrenCount(parent);
+
+        for (int i = 0; i < childCount; i++)
+        {
+            DependencyObject child =
+                System.Windows.Media.VisualTreeHelper
+                    .GetChild(parent, i);
+
+            if (child is T result)
+                return result;
+
+            T? descendant =
+                FindVisualChild<T>(child);
+
+            if (descendant != null)
+                return descendant;
+        }
+
+        return null;
+    }
+    private void FilterButton_Click(
+        object sender,
+        RoutedEventArgs e)
+    {
+        RacerFilterCriteria initial =
+            filterCriteria.Clone();
+
+        RacerFilterDialog dialog =
+            new RacerFilterDialog(initial)
+            {
+                Owner = Window.GetWindow(this)
+            };
+
+        if (dialog.ShowDialog() == true)
+        {
+            filterCriteria =
+                dialog.Criteria;
 
             ApplyFilters();
         }
     }
+
+    private void UpdateFilterButtonText()
+    {
+        if (FilterButton == null)
+            return;
+
+        int count =
+            filterCriteria.ActiveCount;
+
+        FilterButton.Content =
+            count == 0
+                ? "FILTER"
+                : $"FILTER ({count})";
+    }
+
+
+    private static bool TryGetRacingNumber(
+        RacerDisplayItem item,
+        out int number)
+    {
+        return int.TryParse(
+            item.RacingNumber,
+            out number);
+    }
+
     private void SearchBorder_MouseLeftButtonDown(
         object sender,
         MouseButtonEventArgs e)
@@ -141,6 +579,7 @@ IEnumerable<RacerDisplayItem> filtered = racers;
         SearchTextBox.Focus();
         e.Handled = true;
     }
+
     private void SearchTextBox_TextChanged(
         object sender,
         TextChangedEventArgs e)
@@ -148,7 +587,8 @@ IEnumerable<RacerDisplayItem> filtered = racers;
         if (SearchPlaceholder != null)
         {
             SearchPlaceholder.Visibility =
-                string.IsNullOrWhiteSpace(SearchTextBox.Text)
+                string.IsNullOrWhiteSpace(
+                    SearchTextBox.Text)
                     ? Visibility.Visible
                     : Visibility.Collapsed;
         }
@@ -156,75 +596,52 @@ IEnumerable<RacerDisplayItem> filtered = racers;
         ApplyFilters();
     }
 
-
-    private void CategoryButton_Click(
-        object sender,
-        SelectionChangedEventArgs e)
-    {
-                if (!IsInitialized || CategoryTabs == null)
-            return;
-
-if (CategoryTabs.SelectedItem is ListBoxItem item)
-        {
-            selectedCategory =
-                item.Content?.ToString() ?? "All";
-
-            ApplyFilters();
-        }
-    }
-
     private void AddRacerButton_Click(
         object sender,
         RoutedEventArgs e)
     {
-        AddRacerDialog dialog = new AddRacerDialog
-        {
-            Owner = Window.GetWindow(this)
-        };
+        AddRacerDialog dialog =
+            new AddRacerDialog
+            {
+                Owner = Window.GetWindow(this)
+            };
 
-        bool? result = dialog.ShowDialog();
+        bool? result =
+            dialog.ShowDialog();
 
         if (result == true)
             _ = LoadRacersAsync();
     }
 
-    private async void RacersDataGrid_MouseDoubleClick(
+    private async void RacersDataGrid_MouseLeftButtonUp(
         object sender,
         MouseButtonEventArgs e)
     {
+        if (e.ChangedButton != MouseButton.Left)
+            return;
+
+        DependencyObject? source =
+            e.OriginalSource as DependencyObject;
+
+        DataGridRow? row =
+            FindParent<DataGridRow>(source);
+
+        if (row?.Item is not RacerDisplayItem item)
+            return;
+
+        e.Handled = true;
+
         try
         {
-            if (e.ChangedButton != MouseButton.Left ||
-                e.ClickCount < 2)
-            {
-                return;
-            }
-
-            if (RacersDataGrid.SelectedItem
-                is not RacerDisplayItem item)
-            {
-                return;
-            }
-
-            e.Handled = true;
-
             RacerDetailsDialog dialog =
                 new RacerDetailsDialog(item.Racer.Id)
                 {
                     Owner = Window.GetWindow(this)
                 };
 
-            await Dispatcher.InvokeAsync(
-                () => dialog.ShowDialog());
+            dialog.ShowDialog();
 
-            if (dialog.WasDeleted)
-            {
-                await LoadRacersAsync();
-            }
-            else
-            {
-                await LoadRacersAsync();
-            }
+            await LoadRacersAsync();
         }
         catch (Exception ex)
         {
@@ -235,17 +652,32 @@ if (CategoryTabs.SelectedItem is ListBoxItem item)
                 MessageBoxImage.Error);
         }
     }
+
+    private static T? FindParent<T>(
+        DependencyObject? child)
+        where T : DependencyObject
+    {
+        while (child != null)
+        {
+            if (child is T parent)
+                return parent;
+
+            child =
+                System.Windows.Media.VisualTreeHelper
+                    .GetParent(child);
+        }
+
+        return null;
+    }
 }
 
 public class RacerDisplayItem
 {
     public Racer Racer { get; set; } = null!;
 
-    public int Id =>
-        Racer.Id;
+    public int Id => Racer.Id;
 
-    public string Name =>
-        Racer.Name;
+    public string Name => Racer.Name;
 
     public string RacingNumber =>
         Racer.RacingNumber;
@@ -267,6 +699,17 @@ public class RacerDisplayItem
             ? "Active"
             : "Not Active";
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 

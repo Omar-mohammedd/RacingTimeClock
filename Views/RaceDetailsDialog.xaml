@@ -33,6 +33,7 @@
                 BorderThickness="1"
                 CornerRadius="10">
             <DataGrid x:Name="LeaderboardDataGrid"
+                      Style="{StaticResource UnifiedDataGridStyle}"
                       AutoGenerateColumns="False"
                       IsReadOnly="True"
                       GridLinesVisibility="Horizontal"
@@ -58,3 +59,11 @@
                 Click="CloseButton_Click"/>
     </Grid>
 </Window>
+
+
+
+
+
+
+
+

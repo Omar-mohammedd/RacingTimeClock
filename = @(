@@ -1,0 +1,73 @@
+warning: in the working copy of 'Views/RaceDetailsDialog.xaml', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'Views/RacerDetailsDialog.xaml', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/Views/RaceDetailsDialog.xaml b/Views/RaceDetailsDialog.xaml[m
+[1mindex d1e9403..a3582b0 100644[m
+[1m--- a/Views/RaceDetailsDialog.xaml[m
+[1m+++ b/Views/RaceDetailsDialog.xaml[m
+[36m@@ -33,6 +33,7 @@[m
+                 BorderThickness="1"[m
+                 CornerRadius="10">[m
+             <DataGrid x:Name="LeaderboardDataGrid"[m
+[32m+[m[32m                      CellStyle="{StaticResource UnifiedDataGridCellStyle}"[m
+                       AutoGenerateColumns="False"[m
+                       IsReadOnly="True"[m
+                       GridLinesVisibility="Horizontal"[m
+[36m@@ -40,8 +41,7 @@[m
+                       Background="Transparent"[m
+                       BorderThickness="0"[m
+                       RowHeight="40"[m
+[31m-                      FontSize="13">[m
+[31m-                <DataGrid.Columns>[m
+[32m+[m[32m                      FontSize="13">`r`n                <DataGrid.Columns>[m
+                     <DataGridTextColumn Header="Pos" Binding="{Binding PositionDisplay}" Width="80"/>[m
+                     <DataGridTextColumn Header="Racer ID" Binding="{Binding RacerId}" Width="120"/>[m
+                     <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>[m
+[36m@@ -58,3 +58,8 @@[m
+                 Click="CloseButton_Click"/>[m
+     </Grid>[m
+ </Window>[m
+[41m+[m
+[41m+[m
+[41m+[m
+[41m+[m
+[41m+[m
+[1mdiff --git a/Views/RacerDetailsDialog.xaml b/Views/RacerDetailsDialog.xaml[m
+[1mindex e3058fe..a5c19c9 100644[m
+[1m--- a/Views/RacerDetailsDialog.xaml[m
+[1m+++ b/Views/RacerDetailsDialog.xaml[m
+[36m@@ -36,7 +36,7 @@[m
+ [m
+                 <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,0,22">[m
+                     <TextBlock Text="RACER PROFILE"[m
+[31m-                               FontSize="11"[m
+[32m+[m[32m                               FontSize="13"[m
+                                FontWeight="SemiBold"[m
+                                Foreground="{DynamicResource TextSecondaryBrush}"/>[m
+                     <TextBlock x:Name="RacerNameText"[m
+[36m@@ -141,6 +141,7 @@[m
+                     BorderThickness="1"[m
+                     CornerRadius="10">[m
+                 <DataGrid x:Name="HistoryDataGrid"[m
+[32m+[m[32m                          CellStyle="{StaticResource UnifiedDataGridCellStyle}"[m
+                           AutoGenerateColumns="False"[m
+                           IsReadOnly="True"[m
+                           GridLinesVisibility="Horizontal"[m
+[36m@@ -148,8 +149,7 @@[m
+                           Background="Transparent"[m
+                           BorderThickness="0"[m
+                           RowHeight="40"[m
+[31m-                          FontSize="13">[m
+[31m-                    <DataGrid.Columns>[m
+[32m+[m[32m                          FontSize="13">`r`n                    <DataGrid.Columns>[m
+                         <DataGridTextColumn Header="Date &amp; Time" Binding="{Binding StartDateTime, StringFormat={}{0:dd/MM/yyyy HH:mm}}" Width="150"/>[m
+                         <DataGridTextColumn Header="Type" Binding="{Binding RaceType}" Width="80"/>[m
+                         <DataGridTextColumn Header="Distance" Binding="{Binding Distance}" Width="90"/>[m
+[36m@@ -174,3 +174,8 @@[m
+         </Grid>[m
+     </Grid>[m
+ </Window>[m
+[41m+[m
+[41m+[m
+[41m+[m
+[41m+[m
+[41m+[m

@@ -147,6 +147,26 @@ public partial class RacesLogView : UserControl
         RacesPanel.Children.Add(emptyText);
     }
 
+    private void RacesLogTableBorder_SizeChanged(
+        object sender,
+        SizeChangedEventArgs e)
+    {
+        if (RacesLogTableBorder.ActualWidth <= 0 ||
+            RacesLogTableBorder.ActualHeight <= 0)
+        {
+            return;
+        }
+
+        RacesLogTableBorder.Clip =
+            new System.Windows.Media.RectangleGeometry(
+                new System.Windows.Rect(
+                    0,
+                    0,
+                    RacesLogTableBorder.ActualWidth,
+                    RacesLogTableBorder.ActualHeight),
+                10,
+                10);
+    }
     private void AddRaceRow(Race race)
     {
         RacerResult? winner =
@@ -242,7 +262,7 @@ public partial class RacesLogView : UserControl
 
         AddCell(
             grid,
-            string.Empty,
+            race.CompetitionType,
             5,
             true,
             false,
@@ -330,6 +350,9 @@ public partial class RacesLogView : UserControl
         }
     }
 }
+
+
+
 
 
 

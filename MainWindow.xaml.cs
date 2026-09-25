@@ -80,6 +80,7 @@ public partial class MainWindow : Window
     private void OnRaceStarted(
         string distance,
         string raceType,
+        string competitionType,
         int racerCount,
         int seasonId,
         List<NewRaceView.RacerSelectionItem> racers)
@@ -88,6 +89,7 @@ public partial class MainWindow : Window
             new RaceView(
                 distance,
                 raceType,
+                competitionType,
                 racerCount,
                 seasonId,
                 racers);
@@ -130,3 +132,4 @@ public partial class MainWindow : Window
             new SettingsView();
     }
 }
+

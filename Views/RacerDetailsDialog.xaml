@@ -7,15 +7,107 @@
         MinHeight="680"
         MinWidth="820"
         WindowStartupLocation="CenterOwner"
-        Background="{DynamicResource PageBackgroundBrush}">
+        Background="{DynamicResource PageBackgroundBrush}" PreviewMouseDown="Window_PreviewMouseDown">
+
+    <Window.Resources>
+
+        <Style x:Key="HistoryCellTextStyle"
+               TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="VerticalAlignment"
+                    Value="Center"/>
+            <Setter Property="HorizontalAlignment"
+                    Value="Center"/>
+            <Setter Property="TextAlignment"
+                    Value="Center"/>
+        </Style>
+
+        <Style x:Key="HistoryHeaderStyle"
+               TargetType="{x:Type DataGridColumnHeader}">
+            <Setter Property="HorizontalContentAlignment"
+                    Value="Center"/>
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center"/>
+
+            <Setter Property="Padding"
+                    Value="8,0"/>
+        </Style>
+
+        <Style x:Key="HistoryRowStyle"
+               TargetType="{x:Type DataGridRow}">
+            <Setter Property="Cursor"
+                    Value="Hand"/>
+        </Style>
+
+    
+        <Style x:Key="RacerDetailsHistoryHeaderStyle"
+               TargetType="{x:Type DataGridColumnHeader}">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="Background"
+                    Value="{DynamicResource SurfaceSecondaryBrush}"/>
+            <Setter Property="Foreground"
+                    Value="{DynamicResource TextSecondaryBrush}"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="HorizontalContentAlignment"
+                    Value="Center"/>
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center"/>
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        </Style>
+
+        <Style x:Key="RacerDetailsHistoryCellStyle"
+               TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="RacerDetailsHistoryRowStyle"
+               TargetType="{x:Type DataGridRow}">
+            <Setter Property="Height" Value="42"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background"
+                    Value="{DynamicResource SurfaceBrush}"/>
+            <Setter Property="Foreground"
+                    Value="{DynamicResource TextPrimaryBrush}"/>
+            <Setter Property="BorderBrush"
+                    Value="{DynamicResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background"
+                            Value="{DynamicResource SurfaceSecondaryBrush}"/>
+                </Trigger>
+
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background"
+                            Value="{DynamicResource AccentSoftBrush}"/>
+                    <Setter Property="Foreground"
+                            Value="{DynamicResource TextPrimaryBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
 
     <Grid Margin="30">
+
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+
+        <!-- RACER PROFILE -->
 
         <Border Grid.Row="0"
                 Background="{DynamicResource SurfaceBrush}"
@@ -24,21 +116,28 @@
                 CornerRadius="10"
                 Padding="24"
                 Margin="0,0,0,18">
+
             <Grid>
+
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
+
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,0,22">
+                <StackPanel Grid.Row="0"
+                            Grid.ColumnSpan="2"
+                            Margin="0,0,0,22">
+
                     <TextBlock Text="RACER PROFILE"
-                               FontSize="11"
+                               FontSize="13"
                                FontWeight="SemiBold"
                                Foreground="{DynamicResource TextSecondaryBrush}"/>
+
                     <TextBlock x:Name="RacerNameText"
                                FontSize="24"
                                FontWeight="Bold"
@@ -46,52 +145,135 @@
                                Margin="0,5,0,0"/>
                 </StackPanel>
 
-                <Grid Grid.Row="1" Grid.Column="0" Margin="0,0,24,0">
+                <!-- LEFT INFORMATION -->
+
+                <Grid Grid.Row="1"
+                      Grid.Column="0"
+                      Margin="0,0,24,0">
+
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
+
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="130"/>
+                        <ColumnDefinition Width="150"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="0" Text="Racer ID" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
-                    <TextBox x:Name="RacerIdTextBox" Grid.Row="0" Grid.Column="1" IsReadOnly="True" Margin="0,0,0,10"/>
+                    <TextBlock Grid.Row="0"
+                               Text="Racer ID"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               VerticalAlignment="Center"/>
 
-                    <TextBlock Grid.Row="1" Text="Racing Number" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
-                    <TextBox x:Name="RacingNumberTextBox" Grid.Row="1" Grid.Column="1" IsReadOnly="True" Margin="0,0,0,10"/>
+                    <TextBlock x:Name="RacerIdText"
+                               Grid.Row="0"
+                               Grid.Column="1"
+                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               VerticalAlignment="Center"
+                               Visibility="Visible"/>
 
-                    <TextBlock Grid.Row="2" Text="Gender" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
-                    <ComboBox x:Name="GenderComboBox" Grid.Row="2" Grid.Column="1" IsEnabled="False">
+                    <TextBox x:Name="RacerIdTextBox"
+                             Grid.Row="0"
+                             Grid.Column="1"
+                             Visibility="Collapsed"
+                             Margin="0,0,0,10"/>
+
+                    <TextBlock Grid.Row="1"
+                               Text="Racing Number"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               VerticalAlignment="Center"/>
+
+                    <TextBlock x:Name="RacingNumberText"
+                               Grid.Row="1"
+                               Grid.Column="1"
+                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               VerticalAlignment="Center"
+                               Visibility="Visible"/>
+
+                    <TextBox x:Name="RacingNumberTextBox"
+                             Grid.Row="1"
+                             Grid.Column="1"
+                             Visibility="Collapsed"
+                             Margin="0,0,0,10"/>
+
+                    <TextBlock Grid.Row="2"
+                               Text="Gender"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               VerticalAlignment="Center"/>
+
+                    <TextBlock x:Name="GenderText"
+                               Grid.Row="2"
+                               Grid.Column="1"
+                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               VerticalAlignment="Center"
+                               Visibility="Visible"/>
+
+                    <ComboBox x:Name="GenderComboBox"
+                              Grid.Row="2"
+                              Grid.Column="1"
+                              Visibility="Collapsed">
+
                         <ComboBoxItem Content="Male"/>
                         <ComboBoxItem Content="Female"/>
+
                     </ComboBox>
+
                 </Grid>
 
-                <Grid Grid.Row="1" Grid.Column="1">
+                <!-- RIGHT INFORMATION -->
+
+                <Grid Grid.Row="1"
+                      Grid.Column="1">
+
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
+
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="130"/>
+                        <ColumnDefinition Width="150"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="0" Text="Year of Birth" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
-                    <ComboBox x:Name="BirthYearComboBox" Grid.Row="0" Grid.Column="1" Margin="0,0,0,10"/>
+                    <TextBlock Grid.Row="0"
+                               Text="Year of Birth"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               VerticalAlignment="Center"/>
 
-                    <TextBlock Grid.Row="1" Text="Category" Foreground="{DynamicResource TextSecondaryBrush}" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="BirthYearText"
+                               Grid.Row="0"
+                               Grid.Column="1"
+                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               VerticalAlignment="Center"
+                               Visibility="Visible"/>
+
+                    <ComboBox x:Name="BirthYearComboBox"
+                              Grid.Row="0"
+                              Grid.Column="1"
+                              Visibility="Collapsed"
+                              Margin="0,0,0,10"/>
+
+                    <TextBlock Grid.Row="1"
+                               Text="Category"
+                               Foreground="{DynamicResource TextSecondaryBrush}"
+                               VerticalAlignment="Center"/>
+
                     <TextBlock x:Name="CategoryText"
                                Grid.Row="1"
                                Grid.Column="1"
                                FontWeight="SemiBold"
-                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               VerticalAlignment="Center"/>
+
                 </Grid>
+
             </Grid>
+
         </Border>
+
+        <!-- STATISTICS -->
 
         <Border Grid.Row="1"
                 Background="{DynamicResource SurfaceBrush}"
@@ -100,7 +282,9 @@
                 CornerRadius="10"
                 Padding="20"
                 Margin="0,0,0,18">
+
             <Grid>
+
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
@@ -108,21 +292,49 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0">
-                    <TextBlock Text="TOTAL RACES" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-                    <TextBlock x:Name="TotalRacesText" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource TextPrimaryBrush}" Margin="0,4,0,0"/>
+                    <TextBlock Text="TOTAL RACES"
+                               FontSize="11"
+                               Foreground="{DynamicResource TextMutedBrush}"/>
+
+                    <TextBlock x:Name="TotalRacesText"
+                               FontSize="22"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource TextPrimaryBrush}"
+                               Margin="0,4,0,0"/>
                 </StackPanel>
+
                 <StackPanel Grid.Column="1">
-                    <TextBlock Text="VICTORIES" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-                    <TextBlock x:Name="WinsText" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}" Margin="0,4,0,0"/>
+                    <TextBlock Text="VICTORIES"
+                               FontSize="11"
+                               Foreground="{DynamicResource TextMutedBrush}"/>
+
+                    <TextBlock x:Name="WinsText"
+                               FontSize="22"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource SuccessBrush}"
+                               Margin="0,4,0,0"/>
                 </StackPanel>
+
                 <StackPanel Grid.Column="2">
-                    <TextBlock Text="PODIUMS" FontSize="11" Foreground="{DynamicResource TextMutedBrush}"/>
-                    <TextBlock x:Name="PodiumsText" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" Margin="0,4,0,0"/>
+                    <TextBlock Text="PODIUMS"
+                               FontSize="11"
+                               Foreground="{DynamicResource TextMutedBrush}"/>
+
+                    <TextBlock x:Name="PodiumsText"
+                               FontSize="22"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource AccentBrush}"
+                               Margin="0,4,0,0"/>
                 </StackPanel>
+
             </Grid>
+
         </Border>
 
+        <!-- RACE HISTORY -->
+
         <Grid Grid.Row="2">
+
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
@@ -139,38 +351,274 @@
                     Background="{DynamicResource SurfaceBrush}"
                     BorderBrush="{DynamicResource BorderBrush}"
                     BorderThickness="1"
-                    CornerRadius="10">
-                <DataGrid x:Name="HistoryDataGrid"
+                    CornerRadius="10"
+                    ClipToBounds="True">
+
+                                                <DataGrid x:Name="HistoryDataGrid"
                           AutoGenerateColumns="False"
                           IsReadOnly="True"
-                          GridLinesVisibility="Horizontal"
                           HeadersVisibility="Column"
+                          GridLinesVisibility="Horizontal"
                           Background="Transparent"
                           BorderThickness="0"
-                          RowHeight="40"
-                          FontSize="13">
+                          RowHeight="42"
+                          FontSize="12"
+                          CanUserAddRows="False"
+                          CanUserResizeRows="False"
+                          SelectionMode="Single"
+                          SelectionUnit="FullRow"
+                          PreviewMouseDown="HistoryDataGrid_PreviewMouseDown"
+                          MouseDoubleClick="HistoryDataGrid_MouseDoubleClick">
+
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}">
+                            <Setter Property="Height" Value="38"/>
+                            <Setter Property="Padding" Value="8,0"/>
+                            <Setter Property="Background"
+                                    Value="{DynamicResource SurfaceSecondaryBrush}"/>
+                            <Setter Property="Foreground"
+                                    Value="{DynamicResource TextSecondaryBrush}"/>
+                            <Setter Property="FontSize" Value="10"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="HorizontalContentAlignment"
+                                    Value="Center"/>
+                            <Setter Property="VerticalContentAlignment"
+                                    Value="Center"/>
+                            <Setter Property="BorderBrush"
+                                    Value="{DynamicResource BorderBrush}"/>
+                            <Setter Property="BorderThickness"
+                                    Value="0,0,0,1"/>
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
+
+                    <DataGrid.RowStyle>
+                        <Style TargetType="{x:Type DataGridRow}">
+                            <Setter Property="Height" Value="42"/>
+                            <Setter Property="Background"
+                                    Value="{DynamicResource SurfaceBrush}"/>
+                            <Setter Property="Foreground"
+                                    Value="{DynamicResource TextPrimaryBrush}"/>
+                            <Setter Property="BorderBrush"
+                                    Value="{DynamicResource BorderBrush}"/>
+                            <Setter Property="BorderThickness"
+                                    Value="0,0,0,1"/>
+
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background"
+                                            Value="{DynamicResource SurfaceSecondaryBrush}"/>
+                                </Trigger>
+
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background"
+                                            Value="{DynamicResource AccentSoftBrush}"/>
+                                    <Setter Property="Foreground"
+                                            Value="{DynamicResource TextPrimaryBrush}"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.RowStyle>
+
+                    <DataGrid.CellStyle>
+                        <Style TargetType="{x:Type DataGridCell}">
+                            <Setter Property="Background"
+                                    Value="Transparent"/>
+                            <Setter Property="Foreground"
+                                    Value="{DynamicResource TextPrimaryBrush}"/>
+                            <Setter Property="BorderBrush"
+                                    Value="Transparent"/>
+                            <Setter Property="BorderThickness"
+                                    Value="0"/>
+                            <Setter Property="FocusVisualStyle"
+                                    Value="{x:Null}"/>
+                            <Setter Property="HorizontalContentAlignment"
+                                    Value="Center"/>
+                            <Setter Property="VerticalContentAlignment"
+                                    Value="Center"/>
+
+                            <Style.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background"
+                                            Value="Transparent"/>
+                                    <Setter Property="Foreground"
+                                            Value="{DynamicResource TextPrimaryBrush}"/>
+                                    <Setter Property="BorderBrush"
+                                            Value="Transparent"/>
+                                    <Setter Property="BorderThickness"
+                                            Value="0"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.CellStyle>
+
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Date &amp; Time" Binding="{Binding StartDateTime, StringFormat={}{0:dd/MM/yyyy HH:mm}}" Width="150"/>
-                        <DataGridTextColumn Header="Type" Binding="{Binding RaceType}" Width="80"/>
-                        <DataGridTextColumn Header="Distance" Binding="{Binding Distance}" Width="90"/>
-                        <DataGridTextColumn Header="Position" Binding="{Binding PositionDisplay}" Width="100"/>
-                        <DataGridTextColumn Header="Finish Time" Binding="{Binding FormattedFinishTime}" Width="*"/>
+
+                        <DataGridTextColumn Header="DATE &amp; TIME"
+                                            Binding="{Binding StartDateTime, StringFormat={}{0:dd/MM/yyyy HH:mm}}"
+                                            Width="170"/>
+
+                        <DataGridTextColumn Header="TYPE"
+                                            Binding="{Binding RaceType}"
+                                            Width="*"/>
+
+                        <DataGridTextColumn Header="DISTANCE"
+                                            Binding="{Binding Distance}"
+                                            Width="110"/>
+
+                        <DataGridTextColumn Header="POSITION"
+                                            Binding="{Binding PositionDisplay}"
+                                            Width="110"/>
+
+                        <DataGridTextColumn Header="FINISH TIME"
+                                            Binding="{Binding FormattedFinishTime}"
+                                            Width="150"/>
+
                     </DataGrid.Columns>
+
                 </DataGrid>
+
             </Border>
+
         </Grid>
 
-        <Grid Grid.Row="3" Margin="0,18,0,0">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
-                <Button x:Name="EditButton" Content="EDIT RACER" Width="120" Margin="0,0,10,0" Click="EditButton_Click"/>
-                <Button x:Name="SaveButton" Content="SAVE CHANGES" Width="135" Background="{DynamicResource SuccessBrush}" Visibility="Collapsed" Margin="0,0,10,0" Click="SaveButton_Click"/>
-                <Button x:Name="CancelEditButton" Content="CANCEL" Width="100" Style="{StaticResource SecondaryButtonStyle}" Visibility="Collapsed" Margin="0,0,10,0" Click="CancelEditButton_Click"/>
+        <!-- ACTIONS -->
+
+        <Grid Grid.Row="3"
+              Margin="0,18,0,0">
+
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Left">
+
+                <Button x:Name="EditButton"
+                        Content="EDIT RACER"
+                        Width="120"
+                        Margin="0,0,10,0"
+                        Click="EditButton_Click"/>
+
+                <Button x:Name="SaveButton"
+                        Content="SAVE CHANGES"
+                        Width="135"
+                        Background="{DynamicResource SuccessBrush}"
+                        Visibility="Collapsed"
+                        Margin="0,0,10,0"
+                        Click="SaveButton_Click"/>
+
+                <Button x:Name="CancelEditButton"
+                        Content="CANCEL"
+                        Width="100"
+                        Style="{StaticResource SecondaryButtonStyle}"
+                        Visibility="Collapsed"
+                        Margin="0,0,10,0"
+                        Click="CancelEditButton_Click"/>
+
             </StackPanel>
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button x:Name="DeleteButton" Content="DEACTIVATE" Width="120" Background="{DynamicResource DangerBrush}" Margin="0,0,10,0" Click="DeleteButton_Click"/>
-                <Button Content="CLOSE" Width="100" Click="CloseButton_Click"/>
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right">
+
+                                <Button x:Name="StatusButton"
+                        Content="DEACTIVATE"
+                        Width="120"
+                        Background="{DynamicResource DangerActionBackgroundBrush}"
+                        Foreground="{DynamicResource DangerActionForegroundBrush}"
+                        BorderBrush="{DynamicResource DangerBrush}"
+                        BorderThickness="1.5"
+                        Visibility="Collapsed"
+                        Margin="0,0,10,0"
+                        Click="StatusButton_Click"/>
+
+                                <Button x:Name="DeletePermanentButton"
+                        Content="DELETE PERMANENTLY"
+                        Width="165"
+                        Background="{DynamicResource DangerActionBackgroundBrush}"
+                        Foreground="{DynamicResource DangerActionForegroundBrush}"
+                        BorderBrush="{DynamicResource DangerBrush}"
+                        BorderThickness="1.5"
+                        Visibility="Collapsed"
+                        Margin="0,0,10,0"
+                        Click="DeletePermanentButton_Click"/>
+
+                <Button x:Name="CloseButton" Content="CLOSE"
+                        Width="100"
+                        Click="CloseButton_Click"/>
+
             </StackPanel>
+
         </Grid>
+
+        <!-- CONFIRMATION OVERLAY -->
+
+        <Grid x:Name="ConfirmationOverlay"
+              Grid.RowSpan="4"
+              Visibility="Collapsed"
+              Panel.ZIndex="100">
+
+            <Border Background="#99000000"/>
+
+            <Border Width="460"
+                    Padding="24"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="12">
+
+                <Grid>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock x:Name="ConfirmationTitleText"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource TextPrimaryBrush}"/>
+
+                    <TextBlock x:Name="ConfirmationMessageText"
+                               Grid.Row="1"
+                               Margin="0,12,0,24"
+                               FontSize="13"
+                               TextWrapping="Wrap"
+                               Foreground="{DynamicResource TextSecondaryBrush}"/>
+
+                    <StackPanel Grid.Row="2"
+                                Orientation="Horizontal"
+                                HorizontalAlignment="Right">
+
+                        <Button Content="CANCEL"
+                                Width="100"
+                                Style="{StaticResource SecondaryButtonStyle}"
+                                Margin="0,0,10,0"
+                                Click="ConfirmationCancelButton_Click"/>
+
+                        <Button x:Name="ConfirmationConfirmButton"
+                                Content="CONFIRM"
+                                Width="110"
+                                Background="{DynamicResource DangerBrush}"
+                                Click="ConfirmationConfirmButton_Click"/>
+
+                    </StackPanel>
+
+                </Grid>
+
+            </Border>
+
+        </Grid>
+
     </Grid>
+
 </Window>
+
+
+
+
+
+
+
+
+
+
+

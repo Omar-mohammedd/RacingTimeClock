@@ -15,6 +15,7 @@ public partial class RaceView : UserControl
 {
     private readonly string raceDistance;
     private readonly string raceType;
+    private readonly string competitionType;
     private readonly int racerCount;
     private readonly int seasonId;
 
@@ -22,7 +23,9 @@ public partial class RaceView : UserControl
         NewRaceView.RacerSelectionItem> selectedRacers;
 
     private readonly TimingService timingService = new();
+    private readonly ITimingInput timingInput = new KeyboardTimingInput();
     private readonly DatabaseService databaseService = new();
+    private readonly System.Windows.Threading.DispatcherTimer raceTimer;
 
     private readonly List<bool> racerFinished = new();
 
@@ -33,14 +36,23 @@ public partial class RaceView : UserControl
     public RaceView(
         string distance,
         string type,
+        string competition,
         int numberOfRacers,
         int selectedSeasonId,
         List<NewRaceView.RacerSelectionItem> racers)
     {
         InitializeComponent();
 
+        raceTimer = new System.Windows.Threading.DispatcherTimer
+        {
+            Interval = TimeSpan.FromMilliseconds(10)
+        };
+
+        raceTimer.Tick += RaceTimer_Tick;
+
         raceDistance = distance;
         raceType = type;
+        competitionType = competition;
         racerCount = numberOfRacers;
         seasonId = selectedSeasonId;
         selectedRacers = racers;
@@ -61,13 +73,53 @@ public partial class RaceView : UserControl
         BuildRacerRows();
 
         Loaded += RaceView_Loaded;
+        Unloaded += RaceView_Unloaded;
+        timingInput.TimingEventReceived += TimingInput_TimingEventReceived;
     }
 
     private void RaceView_Loaded(
         object sender,
         RoutedEventArgs e)
     {
+        timingInput.Start();
         Focus();
+    }
+
+    private void RaceView_Unloaded(
+        object sender,
+        RoutedEventArgs e)
+    {
+        timingInput.Stop();
+    }
+
+    private void TimingInput_TimingEventReceived(
+        object? sender,
+        TimingEvent e)
+    {
+        if (raceCompleted)
+            return;
+
+        switch (e.Type)
+        {
+            case TimingEventType.Start:
+                StartRace();
+                break;
+
+            case TimingEventType.Finish:
+                if (e.RacerNumber >= 1 &&
+                    e.RacerNumber <= racerCount)
+                {
+                    FinishRacer(e.RacerNumber);
+                }
+
+                break;
+
+            case TimingEventType.Lap:
+                break;
+
+            case TimingEventType.FalseStart:
+                break;
+        }
     }
 
     private void BuildRacerRows()
@@ -183,44 +235,26 @@ public partial class RaceView : UserControl
         if (raceCompleted)
             return;
 
-        if (e.Key == Key.Space)
-        {
-            StartRace();
+        bool handled =
+            e.Key == Key.Space ||
+            e.Key is
+                Key.D1 or Key.D2 or Key.D3 or
+                Key.D4 or Key.D5 or Key.D6 or
+                Key.D7 or Key.D8 or Key.D9 or
+                Key.NumPad1 or Key.NumPad2 or Key.NumPad3 or
+                Key.NumPad4 or Key.NumPad5 or Key.NumPad6 or
+                Key.NumPad7 or Key.NumPad8 or Key.NumPad9;
 
-            e.Handled = true;
-
+        if (!handled)
             return;
+
+        if (timingInput is KeyboardTimingInput keyboardInput)
+        {
+            keyboardInput.ProcessKey(e.Key);
         }
 
-        int racerNumber =
-            GetRacerNumber(e.Key);
-
-        if (racerNumber >= 1 &&
-            racerNumber <= racerCount)
-        {
-            FinishRacer(racerNumber);
-
-            e.Handled = true;
-        }
+        e.Handled = true;
     }
-
-    private int GetRacerNumber(Key key)
-    {
-        return key switch
-        {
-            Key.D1 or Key.NumPad1 => 1,
-            Key.D2 or Key.NumPad2 => 2,
-            Key.D3 or Key.NumPad3 => 3,
-            Key.D4 or Key.NumPad4 => 4,
-            Key.D5 or Key.NumPad5 => 5,
-            Key.D6 or Key.NumPad6 => 6,
-            Key.D7 or Key.NumPad7 => 7,
-            Key.D8 or Key.NumPad8 => 8,
-            Key.D9 or Key.NumPad9 => 9,
-            _ => 0
-        };
-    }
-
     private void StartRace()
     {
         if (raceStarted)
@@ -239,16 +273,23 @@ public partial class RaceView : UserControl
         StartTimerDisplay();
     }
 
-    private async void StartTimerDisplay()
+    private void StartTimerDisplay()
     {
-        while (raceStarted &&
-               !raceCompleted)
-        {
-            UpdateTimerDisplay();
+        raceTimer.Start();
+        UpdateTimerDisplay();
+    }
 
-            await System.Threading.Tasks.Task
-                .Delay(10);
+    private void RaceTimer_Tick(
+        object? sender,
+        EventArgs e)
+    {
+        if (!raceStarted || raceCompleted)
+        {
+            raceTimer.Stop();
+            return;
         }
+
+        UpdateTimerDisplay();
     }
 
     private void UpdateTimerDisplay()
@@ -319,6 +360,7 @@ public partial class RaceView : UserControl
         timingService.Complete();
 
         raceCompleted = true;
+        raceTimer.Stop();
         raceStarted = false;
 
         StatusText.Text =
@@ -358,6 +400,7 @@ public partial class RaceView : UserControl
         {
             Distance = raceDistance,
             RaceType = raceType,
+            CompetitionType = competitionType,
             StartDateTime =
                 timingService.StartDateTime,
             RacerCount = racerCount,
@@ -445,6 +488,18 @@ public partial class RaceView : UserControl
         }
     }
 
+    protected override void OnVisualParentChanged(
+        DependencyObject oldParent)
+    {
+        if (VisualParent == null)
+        {
+            raceTimer.Stop();
+            timingInput.Stop();
+        }
+
+        base.OnVisualParentChanged(oldParent);
+    }
+
     private string FormatTime(
         TimeSpan time)
     {
@@ -454,6 +509,10 @@ public partial class RaceView : UserControl
             $"{time.Milliseconds:000}";
     }
 }
+
+
+
+
 
 
 

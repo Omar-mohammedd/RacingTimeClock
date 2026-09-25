@@ -6,10 +6,47 @@ namespace RacingTimeClock;
 
 public partial class App : Application
 {
+    private async Task SeedTestRacersAndExitAsync()
+    {
+        DatabaseService databaseService =
+            new DatabaseService();
+
+        await databaseService.InitializeAsync();
+
+        int added =
+            await databaseService.SeedTestRacersAsync(500);
+
+        MessageBox.Show(
+            $"Added {added} test racers.",
+            "Test Racers",
+            MessageBoxButton.OK,
+            MessageBoxImage.Information);
+    }
     protected override async void OnStartup(
         StartupEventArgs e)
     {
         base.OnStartup(e);
+
+        if (e.Args.Contains(
+                "--seed-test-racers",
+                StringComparer.OrdinalIgnoreCase))
+        {
+            try
+            {
+                await SeedTestRacersAndExitAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    ex.ToString(),
+                    "Test Racer Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+
+            Shutdown();
+            return;
+        }
 
         ThemeService.Initialize();
 
@@ -50,3 +87,4 @@ public partial class App : Application
         }
     }
 }
+

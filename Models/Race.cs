@@ -11,6 +11,8 @@ public class Race
 
     public string RaceType { get; set; } = string.Empty;
 
+    public string CompetitionType { get; set; } = string.Empty;
+
     public DateTime StartDateTime { get; set; }
 
     public int RacerCount { get; set; }
@@ -23,3 +25,4 @@ public class Race
 
     public List<RacerResult> Results { get; set; } = new();
 }
+

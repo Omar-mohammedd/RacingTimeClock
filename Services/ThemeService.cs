@@ -119,7 +119,13 @@ public static class ThemeService
         resources["ButtonShadowColor"] =
             CreateColor("#000000");
 
-        resources["DangerBrush"] =
+        resources["DangerActionBackgroundBrush"] =
+    CreateBrush(dark ? "#000000" : "#FFFFFF");
+
+resources["DangerActionForegroundBrush"] =
+    CreateBrush(dark ? "#FFFFFF" : "#20232A");
+
+resources["DangerBrush"] =
             CreateBrush(
                 dark ? "#E05252" : "#C62828");
 
@@ -322,3 +328,5 @@ public static class ThemeService
         return (Color)ColorConverter.ConvertFromString(hex)!;
     }
 }
+
+

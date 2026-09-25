@@ -140,10 +140,14 @@
                             <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource AccentBrush}"/>
                             <Setter TargetName="ItemContent" Property="TextElement.Foreground" Value="#FFFFFF"/>
                         </Trigger>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource TextPrimaryBrush}"/>
-                            <Setter TargetName="ItemContent" Property="TextElement.Foreground" Value="#FFFFFF"/>
-                        </Trigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsMouseOver, RelativeSource={RelativeSource Self}}" Value="True"/>
+                                <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="False"/>
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource AccentSoftBrush}"/>
+                            <Setter TargetName="ItemContent" Property="TextElement.Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+                        </MultiDataTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
@@ -197,26 +201,10 @@
     <Style TargetType="{x:Type ComboBoxItem}" BasedOn="{StaticResource ModernComboBoxItemStyle}"/>
     <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource ModernTextBoxStyle}"/>
 
-    <Style x:Key="UnifiedDataGridStyle" TargetType="{x:Type DataGrid}">
-        <Setter Property="FontFamily" Value="Segoe UI"/>
-        <Setter Property="FontSize" Value="13"/>
-        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
-        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
-        <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="RowHeight" Value="40"/>
-        <Setter Property="GridLinesVisibility" Value="Horizontal"/>
-        <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource BorderBrush}"/>
-        <Setter Property="VerticalGridLinesBrush" Value="Transparent"/>
-        <Setter Property="HeadersVisibility" Value="Column"/>
-        <Setter Property="CanUserAddRows" Value="False"/>
-        <Setter Property="CanUserResizeRows" Value="False"/>
-        <Setter Property="IsReadOnly" Value="True"/>
-    </Style>
+    <!-- Unified DataGrid styling -->
 
-    <Style TargetType="{x:Type DataGrid}" BasedOn="{StaticResource UnifiedDataGridStyle}"/>
-
-    <Style x:Key="UnifiedDataGridHeaderStyle" TargetType="{x:Type DataGridColumnHeader}">
+    <Style x:Key="UnifiedDataGridHeaderStyle"
+           TargetType="{x:Type DataGridColumnHeader}">
         <Setter Property="Height" Value="38"/>
         <Setter Property="Padding" Value="12,0"/>
         <Setter Property="Background" Value="{DynamicResource SurfaceSecondaryBrush}"/>
@@ -226,34 +214,64 @@
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
         <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
 
-    <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource UnifiedDataGridHeaderStyle}"/>
-
-    <Style x:Key="UnifiedDataGridRowStyle" TargetType="{x:Type DataGridRow}">
+    <Style x:Key="UnifiedDataGridRowStyle"
+           TargetType="{x:Type DataGridRow}">
         <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
         <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
         <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
         <Setter Property="BorderThickness" Value="0,0,0,1"/>
-        <Setter Property="Height" Value="42"/>
+        <Setter Property="Height" Value="40"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{DynamicResource SurfaceSecondaryBrush}"/>
+                <Setter Property="Background"
+                        Value="{DynamicResource SurfaceSecondaryBrush}"/>
             </Trigger>
             <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="{DynamicResource AccentSoftBrush}"/>
-                <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+                <Setter Property="Background"
+                        Value="{DynamicResource AccentSoftBrush}"/>
+                <Setter Property="Foreground"
+                        Value="{DynamicResource TextPrimaryBrush}"/>
             </Trigger>
         </Style.Triggers>
     </Style>
-    <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource UnifiedDataGridRowStyle}"/>
-    <Style x:Key="UnifiedDataGridCellStyle" TargetType="{x:Type DataGridCell}">
+
+    <Style x:Key="UnifiedDataGridCellStyle"
+           TargetType="{x:Type DataGridCell}">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Padding" Value="12,0"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
-    <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource UnifiedDataGridCellStyle}"/></ResourceDictionary>
+
+    <Style x:Key="UnifiedDataGridStyle"
+           TargetType="{x:Type DataGrid}">
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource SurfaceBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+        <Setter Property="HorizontalGridLinesBrush"
+                Value="{DynamicResource BorderBrush}"/>
+        <Setter Property="VerticalGridLinesBrush"
+                Value="Transparent"/>
+        <Setter Property="HeadersVisibility" Value="Column"/>
+        <Setter Property="CanUserAddRows" Value="False"/>
+        <Setter Property="CanUserResizeRows" Value="False"/>
+        <Setter Property="IsReadOnly" Value="True"/>
+        <Setter Property="RowHeight" Value="40"/>
+        <Setter Property="ColumnHeaderStyle"
+                Value="{StaticResource UnifiedDataGridHeaderStyle}"/>
+        <Setter Property="RowStyle"
+                Value="{StaticResource UnifiedDataGridRowStyle}"/>
+        <Setter Property="CellStyle"
+                Value="{StaticResource UnifiedDataGridCellStyle}"/>
+    </Style>
+</ResourceDictionary>
 
 

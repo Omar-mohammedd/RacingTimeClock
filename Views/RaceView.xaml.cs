@@ -387,7 +387,7 @@ public partial class RaceView : UserControl
 
         if (seasonId <= 0)
         {
-            MessageBox.Show(
+            RacingTimeClock.Services.RacingPopupService.Show(
                 "The race has no valid season.",
                 "Save Error",
                 MessageBoxButton.OK,
@@ -480,7 +480,7 @@ public partial class RaceView : UserControl
         }
         catch (Exception ex)
         {
-            MessageBox.Show(
+            RacingTimeClock.Services.RacingPopupService.Show(
                 ex.ToString(),
                 "Save Error",
                 MessageBoxButton.OK,
@@ -488,19 +488,7 @@ public partial class RaceView : UserControl
         }
     }
 
-    protected override void OnVisualParentChanged(
-        DependencyObject oldParent)
-    {
-        if (VisualParent == null)
-        {
-            raceTimer.Stop();
-            timingInput.Stop();
-        }
-
-        base.OnVisualParentChanged(oldParent);
-    }
-
-    private string FormatTime(
+private string FormatTime(
         TimeSpan time)
     {
         return
@@ -509,6 +497,8 @@ public partial class RaceView : UserControl
             $"{time.Milliseconds:000}";
     }
 }
+
+
 
 
 

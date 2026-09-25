@@ -100,7 +100,7 @@ public partial class NewRaceView : UserControl
         }
         catch (Exception ex)
         {
-            MessageBox.Show(
+            RacingTimeClock.Services.RacingPopupService.Show(
                 $"Could not load race setup data.\n\n{ex}",
                 "New Race Error",
                 MessageBoxButton.OK,
@@ -933,6 +933,7 @@ public partial class NewRaceView : UserControl
             selections);
     }
 }
+
 
 
 

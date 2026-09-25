@@ -16,7 +16,7 @@ public partial class App : Application
         int added =
             await databaseService.SeedTestRacersAsync(500);
 
-        MessageBox.Show(
+        RacingTimeClock.Services.RacingPopupService.Show(
             $"Added {added} test racers.",
             "Test Racers",
             MessageBoxButton.OK,
@@ -37,7 +37,7 @@ public partial class App : Application
             }
             catch (Exception ex)
             {
-                MessageBox.Show(
+                RacingTimeClock.Services.RacingPopupService.Show(
                     ex.ToString(),
                     "Test Racer Error",
                     MessageBoxButton.OK,
@@ -77,7 +77,7 @@ public partial class App : Application
         }
         catch (Exception ex)
         {
-            MessageBox.Show(
+            RacingTimeClock.Services.RacingPopupService.Show(
                 $"Could not initialize the application.\n\n{ex}",
                 "Startup Error",
                 MessageBoxButton.OK,
@@ -87,4 +87,5 @@ public partial class App : Application
         }
     }
 }
+
 

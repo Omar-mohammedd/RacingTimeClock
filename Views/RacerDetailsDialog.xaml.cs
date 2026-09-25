@@ -16,10 +16,6 @@ public partial class RacerDetailsDialog : Window
     private bool editing;
 
     private Racer? loadedRacer;
-
-    private ConfirmationAction pendingConfirmation =
-        ConfirmationAction.None;
-
     public bool WasDeleted { get; private set; }
 
     private enum ConfirmationAction
@@ -111,7 +107,7 @@ public partial class RacerDetailsDialog : Window
 
             if (racer == null)
             {
-                MessageBox.Show(
+                RacingTimeClock.Services.RacingPopupService.Show(
                     "The racer could not be found.",
                     "Racer Not Found",
                     MessageBoxButton.OK,
@@ -121,12 +117,12 @@ public partial class RacerDetailsDialog : Window
                 return;
             }
 
-            loadedRacer = racer;
-
-            RacerNameText.Text =
+            loadedRacer = racer;            RacerNameText.Text =
                 racer.Name;
 
-            RacerIdText.Text =
+            RacerNameTextBox.Text =
+                racer.Name;
+RacerIdText.Text =
                 racer.RacerId;
 
             RacerIdTextBox.Text =
@@ -217,7 +213,7 @@ public partial class RacerDetailsDialog : Window
         }
         catch (Exception ex)
         {
-            MessageBox.Show(
+            RacingTimeClock.Services.RacingPopupService.Show(
                 $"Could not load racer details.\n\n{ex.Message}",
                 "Racer Details Error",
                 MessageBoxButton.OK,
@@ -357,12 +353,44 @@ public partial class RacerDetailsDialog : Window
         object sender,
         RoutedEventArgs e)
     {
+        string name =
+            RacerNameTextBox.Text.Trim();
+
+        string racerIdValue =
+            RacerIdTextBox.Text.Trim();
+
+        string racingNumberInput =
+            RacingNumberTextBox.Text.Trim();
+
+        if (!RacerValidationService.IsValidName(name))
+        {
+            RacingTimeClock.Services.RacingPopupService.Show(
+                "Name must contain English or Arabic letters separated by spaces only.",
+                "Invalid Name",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+
+            return;
+        }
+
+        if (!RacerValidationService.IsValidRacerId(
+                racerIdValue))
+        {
+            RacingTimeClock.Services.RacingPopupService.Show(
+                "Racer ID must contain exactly 14 digits.",
+                "Invalid Racer ID",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+
+            return;
+        }
+
         if (!int.TryParse(
                 BirthYearComboBox.SelectedItem?.ToString() ??
                 string.Empty,
                 out int birthYear))
         {
-            MessageBox.Show(
+            RacingTimeClock.Services.RacingPopupService.Show(
                 "Year of birth must be a valid number.",
                 "Invalid Year",
                 MessageBoxButton.OK,
@@ -374,7 +402,7 @@ public partial class RacerDetailsDialog : Window
         if (birthYear < 1900 ||
             birthYear > DateTime.Now.Year)
         {
-            MessageBox.Show(
+            RacingTimeClock.Services.RacingPopupService.Show(
                 "Please enter a valid year of birth.",
                 "Invalid Year",
                 MessageBoxButton.OK,
@@ -383,37 +411,9 @@ public partial class RacerDetailsDialog : Window
             return;
         }
 
-        string racerIdValue =
-            RacerIdTextBox.Text.Trim();
-
-        string racingNumber =
-            RacingNumberTextBox.Text.Trim();
-
-        if (string.IsNullOrWhiteSpace(racerIdValue))
-        {
-            MessageBox.Show(
-                "Racer ID cannot be empty.",
-                "Invalid Racer ID",
-                MessageBoxButton.OK,
-                MessageBoxImage.Warning);
-
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(racingNumber))
-        {
-            MessageBox.Show(
-                "Racing number cannot be empty.",
-                "Invalid Racing Number",
-                MessageBoxButton.OK,
-                MessageBoxImage.Warning);
-
-            return;
-        }
-
         if (GenderComboBox.SelectedIndex < 0)
         {
-            MessageBox.Show(
+            RacingTimeClock.Services.RacingPopupService.Show(
                 "Please select a gender.",
                 "Invalid Gender",
                 MessageBoxButton.OK,
@@ -425,7 +425,7 @@ public partial class RacerDetailsDialog : Window
         try
         {
             using RacingTimeClockDbContext db =
-                new RacingTimeClockDbContext();
+                new();
 
             Racer? racer =
                 await db.Racers
@@ -434,7 +434,7 @@ public partial class RacerDetailsDialog : Window
 
             if (racer == null)
             {
-                MessageBox.Show(
+                RacingTimeClock.Services.RacingPopupService.Show(
                     "The racer could not be found.",
                     "Racer Not Found",
                     MessageBoxButton.OK,
@@ -451,7 +451,7 @@ public partial class RacerDetailsDialog : Window
 
             if (duplicateId)
             {
-                MessageBox.Show(
+                RacingTimeClock.Services.RacingPopupService.Show(
                     "That Racer ID is already in use.",
                     "Duplicate Racer ID",
                     MessageBoxButton.OK,
@@ -459,6 +459,54 @@ public partial class RacerDetailsDialog : Window
 
                 return;
             }
+
+            string racingNumber =
+                racingNumberInput;
+
+            if (RacerValidationService.IsNewRacingNumber(
+                    racingNumber))
+            {
+                string[] usedNumbers =
+                    await db.Racers
+                        .Where(r => r.Id != racerId)
+                        .Select(r => r.RacingNumber)
+                        .ToArrayAsync();
+
+                racingNumber =
+                    RacerValidationService.GenerateUniqueRacingNumber(
+                        usedNumbers);
+            }
+            else if (!RacerValidationService.IsValidNumericRacingNumber(
+                         racingNumber))
+            {
+                RacingTimeClock.Services.RacingPopupService.Show(
+                    "Racing number must contain 1 to 4 digits, or be \"جديد\".",
+                    "Invalid Racing Number",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return;
+            }
+
+            bool duplicateRacingNumber =
+                await db.Racers.AnyAsync(
+                    r =>
+                        r.Id != racerId &&
+                        r.RacingNumber == racingNumber);
+
+            if (duplicateRacingNumber)
+            {
+                RacingTimeClock.Services.RacingPopupService.Show(
+                    "That racing number is already in use.",
+                    "Duplicate Racing Number",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return;
+            }
+
+            racer.Name =
+                name;
 
             racer.RacerId =
                 racerIdValue;
@@ -478,7 +526,7 @@ public partial class RacerDetailsDialog : Window
 
             await LoadRacerDetailsAsync();
 
-            MessageBox.Show(
+            RacingTimeClock.Services.RacingPopupService.Show(
                 "Racer information updated successfully.",
                 "Racer Updated",
                 MessageBoxButton.OK,
@@ -486,7 +534,7 @@ public partial class RacerDetailsDialog : Window
         }
         catch (Exception ex)
         {
-            MessageBox.Show(
+            RacingTimeClock.Services.RacingPopupService.Show(
                 $"Could not save racer changes.\n\n{ex.Message}",
                 "Save Error",
                 MessageBoxButton.OK,
@@ -498,9 +546,11 @@ public partial class RacerDetailsDialog : Window
         object sender,
         RoutedEventArgs e)
     {
-        if (loadedRacer != null)
+                if (loadedRacer != null)
         {
-            RacerIdTextBox.Text =
+            RacerNameTextBox.Text =
+                loadedRacer.Name;
+RacerIdTextBox.Text =
                 loadedRacer.RacerId;
 
             RacingNumberTextBox.Text =
@@ -516,11 +566,20 @@ public partial class RacerDetailsDialog : Window
         SetEditMode(false);
     }
 
-    private void SetEditMode(bool value)
+        private void SetEditMode(bool value)
     {
         editing = value;
 
-        RacerIdText.Visibility =
+        RacerNameText.Visibility =
+            value
+                ? Visibility.Collapsed
+                : Visibility.Visible;
+
+        RacerNameTextBox.Visibility =
+            value
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+RacerIdText.Visibility =
             value
                 ? Visibility.Collapsed
                 : Visibility.Visible;
@@ -664,53 +723,28 @@ public partial class RacerDetailsDialog : Window
             "The racer will be permanently removed from the database. " +
             "Historical race results will be preserved without the racer record.");
     }
-
-    private void ShowConfirmation(
+    private async void ShowConfirmation(
         ConfirmationAction action,
         string title,
         string message)
     {
-        pendingConfirmation =
-            action;
+        bool destructive =
+            action == ConfirmationAction.PermanentDelete;
 
-        ConfirmationTitleText.Text =
-            title;
-
-        ConfirmationMessageText.Text =
-            message;
-
-        ConfirmationConfirmButton.Content =
-            action == ConfirmationAction.PermanentDelete
+        string confirmText =
+            destructive
                 ? "DELETE"
                 : "CONFIRM";
 
-        ConfirmationOverlay.Visibility =
-            Visibility.Visible;
-    }
+        bool confirmed =
+            RacingPopupService.Confirm(
+                title,
+                message,
+                confirmText,
+                destructive);
 
-    private void ConfirmationCancelButton_Click(
-        object sender,
-        RoutedEventArgs e)
-    {
-        pendingConfirmation =
-            ConfirmationAction.None;
-
-        ConfirmationOverlay.Visibility =
-            Visibility.Collapsed;
-    }
-
-    private async void ConfirmationConfirmButton_Click(
-        object sender,
-        RoutedEventArgs e)
-    {
-        ConfirmationAction action =
-            pendingConfirmation;
-
-        pendingConfirmation =
-            ConfirmationAction.None;
-
-        ConfirmationOverlay.Visibility =
-            Visibility.Collapsed;
+        if (!confirmed)
+            return;
 
         switch (action)
         {
@@ -741,7 +775,7 @@ public partial class RacerDetailsDialog : Window
 
             if (racer == null)
             {
-                MessageBox.Show(
+                RacingTimeClock.Services.RacingPopupService.Show(
                     "The racer could not be found.",
                     "Racer Not Found",
                     MessageBoxButton.OK,
@@ -763,7 +797,7 @@ public partial class RacerDetailsDialog : Window
         }
         catch (Exception ex)
         {
-            MessageBox.Show(
+            RacingTimeClock.Services.RacingPopupService.Show(
                 $"Could not update racer status.\n\n{ex.Message}",
                 "Status Update Error",
                 MessageBoxButton.OK,
@@ -783,7 +817,7 @@ public partial class RacerDetailsDialog : Window
 
             if (racer == null)
             {
-                MessageBox.Show(
+                RacingTimeClock.Services.RacingPopupService.Show(
                     "The racer could not be found.",
                     "Racer Not Found",
                     MessageBoxButton.OK,
@@ -814,7 +848,7 @@ public partial class RacerDetailsDialog : Window
         }
         catch (Exception ex)
         {
-            MessageBox.Show(
+            RacingTimeClock.Services.RacingPopupService.Show(
                 $"Could not permanently delete the racer.\n\n{ex.Message}",
                 "Delete Error",
                 MessageBoxButton.OK,
@@ -829,6 +863,10 @@ public partial class RacerDetailsDialog : Window
         Close();
     }
 }
+
+
+
+
 
 
 

@@ -83,7 +83,7 @@ public partial class RaceDetailsDialog : Window
 
             if (race == null)
             {
-                MessageBox.Show("Race record not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                RacingTimeClock.Services.RacingPopupService.Show("Race record not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 Close();
                 return;
             }
@@ -111,7 +111,7 @@ public partial class RaceDetailsDialog : Window
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Failed to load race details.\n\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            RacingTimeClock.Services.RacingPopupService.Show($"Failed to load race details.\n\n{ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -120,6 +120,7 @@ public partial class RaceDetailsDialog : Window
         Close();
     }
 }
+
 
 
 

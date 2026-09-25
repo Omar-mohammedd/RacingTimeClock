@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using RacingTimeClock.Models;
 using System;
 using System.IO;
@@ -58,6 +58,12 @@ public class RacingTimeClockDbContext : DbContext
             .HasConversion(
                 time => time.Ticks,
                 ticks => TimeSpan.FromTicks(ticks));
+
+        modelBuilder.Entity<Racer>()
+            .Property(r => r.FirstName)
+            .HasComputedColumnSql(
+                "CASE WHEN instr(trim(Name), ' ') > 0 THEN substr(trim(Name), 1, instr(trim(Name), ' ') - 1) ELSE trim(Name) END",
+                stored: false)
+            .ValueGeneratedOnAddOrUpdate();
     }
 }
-

@@ -213,8 +213,7 @@ public partial class RacerFilterDialog : Window
     private void ShowValidation(
         string message)
     {
-        MessageBox.Show(
-            this,
+        RacingTimeClock.Services.RacingPopupService.Show(
             message,
             "Invalid Filter",
             MessageBoxButton.OK,
@@ -303,4 +302,6 @@ public class RacerFilterCriteria
         };
     }
 }
+
+
 

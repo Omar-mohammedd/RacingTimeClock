@@ -8,6 +8,8 @@ public class Racer
 
     public string Name { get; set; } = string.Empty;
 
+    public string FirstName { get; private set; } = string.Empty;
+
     public int YearOfBirth { get; set; }
 
     public bool IsMale { get; set; }

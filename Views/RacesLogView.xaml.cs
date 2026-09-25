@@ -81,7 +81,7 @@ public partial class RacesLogView : UserControl
         {
             isLoading = false;
 
-            MessageBox.Show(
+            RacingTimeClock.Services.RacingPopupService.Show(
                 $"Could not load races.\n\n{ex.Message}",
                 "Races Log Error",
                 MessageBoxButton.OK,
@@ -350,6 +350,7 @@ public partial class RacesLogView : UserControl
         }
     }
 }
+
 
 
 

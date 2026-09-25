@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.EntityFrameworkCore;
 using RacingTimeClock.Data;
 using RacingTimeClock.Models;
 using RacingTimeClock.Services;
@@ -60,50 +60,32 @@ public partial class AddRacerDialog : Window
         string racingNumber =
             RacingNumberTextBox.Text.Trim();
 
-        // -------------------------
-        // Racer ID
-        // -------------------------
-
-        if (!Regex.IsMatch(
-                racerId,
-                @"^\d{5}$"))
+        if (!RacerValidationService.IsValidRacerId(racerId))
         {
-            MessageBox.Show(
-                "Racer ID must be exactly 5 numbers.",
-                "Validation Error",
+            RacingTimeClock.Services.RacingPopupService.Show(
+                "Racer ID must contain exactly 14 digits.",
+                "Invalid Racer ID",
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
 
             return;
         }
 
-        // -------------------------
-        // Name
-        // -------------------------
-
-        if (string.IsNullOrWhiteSpace(name) ||
-            name.Length > 20 ||
-            !Regex.IsMatch(
-                name,
-                @"^[A-Za-z ]+$"))
+        if (!RacerValidationService.IsValidName(name))
         {
-            MessageBox.Show(
-                "Name must contain letters only and be no more than 20 characters.",
-                "Validation Error",
+            RacingTimeClock.Services.RacingPopupService.Show(
+                "Name must contain English or Arabic letters separated by spaces only.",
+                "Invalid Name",
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
 
             return;
         }
-
-        // -------------------------
-        // Gender
-        // -------------------------
 
         if (GenderComboBox.SelectedItem
             is not ComboBoxItem genderItem)
         {
-            MessageBox.Show(
+            RacingTimeClock.Services.RacingPopupService.Show(
                 "Please select a gender.",
                 "Validation Error",
                 MessageBoxButton.OK,
@@ -115,35 +97,12 @@ public partial class AddRacerDialog : Window
         bool isMale =
             genderItem.Content?.ToString() == "Male";
 
-        // -------------------------
-        // Racing Number
-        // -------------------------
-
-        if (string.IsNullOrWhiteSpace(racingNumber) ||
-            racingNumber.Length > 4 ||
-            !Regex.IsMatch(
-                racingNumber,
-                @"^\d{1,4}$"))
-        {
-            MessageBox.Show(
-                "Racing number must contain numbers only and be no more than 4 digits.",
-                "Validation Error",
-                MessageBoxButton.OK,
-                MessageBoxImage.Warning);
-
-            return;
-        }
-
-        // -------------------------
-        // Current Season
-        // -------------------------
-
         Season? season =
             AppSeasonService.Instance.CurrentSeason;
 
         if (season == null)
         {
-            MessageBox.Show(
+            RacingTimeClock.Services.RacingPopupService.Show(
                 "No season is selected. Please select a season in Settings.",
                 "Validation Error",
                 MessageBoxButton.OK,
@@ -152,13 +111,9 @@ public partial class AddRacerDialog : Window
             return;
         }
 
-        // -------------------------
-        // Year of Birth
-        // -------------------------
-
         if (YobComboBox.SelectedItem is not int yob)
         {
-            MessageBox.Show(
+            RacingTimeClock.Services.RacingPopupService.Show(
                 "Please select a year of birth.",
                 "Validation Error",
                 MessageBoxButton.OK,
@@ -167,24 +122,59 @@ public partial class AddRacerDialog : Window
             return;
         }
 
-        // -------------------------
-        // Database
-        // -------------------------
-
         try
         {
             using RacingTimeClockDbContext db =
                 new();
 
             bool idExists =
-                db.Racers.Any(
+                await db.Racers.AnyAsync(
                     r => r.RacerId == racerId);
 
             if (idExists)
             {
-                MessageBox.Show(
+                RacingTimeClock.Services.RacingPopupService.Show(
                     "This Racer ID already exists. Racer IDs must be unique.",
-                    "Validation Error",
+                    "Duplicate Racer ID",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return;
+            }
+
+            if (RacerValidationService.IsNewRacingNumber(
+                    racingNumber))
+            {
+                string[] usedNumbers =
+                    await db.Racers
+                        .Select(r => r.RacingNumber)
+                        .ToArrayAsync();
+
+                racingNumber =
+                    RacerValidationService.GenerateUniqueRacingNumber(
+                        usedNumbers);
+            }
+            else if (!RacerValidationService.IsValidNumericRacingNumber(
+                         racingNumber))
+            {
+                RacingTimeClock.Services.RacingPopupService.Show(
+                    "Racing number must contain 1 to 4 digits, or be \"جديد\".",
+                    "Invalid Racing Number",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+
+                return;
+            }
+
+            bool racingNumberExists =
+                await db.Racers.AnyAsync(
+                    r => r.RacingNumber == racingNumber);
+
+            if (racingNumberExists)
+            {
+                RacingTimeClock.Services.RacingPopupService.Show(
+                    "That racing number is already in use.",
+                    "Duplicate Racing Number",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
 
@@ -210,7 +200,7 @@ public partial class AddRacerDialog : Window
         }
         catch (Exception ex)
         {
-            MessageBox.Show(
+            RacingTimeClock.Services.RacingPopupService.Show(
                 $"Failed to save racer.\n\n{ex}",
                 "Database Error",
                 MessageBoxButton.OK,
@@ -226,3 +216,5 @@ public partial class AddRacerDialog : Window
         Close();
     }
 }
+
+

@@ -162,7 +162,7 @@ public partial class SettingsView : UserControl
         }
         catch (Exception ex)
         {
-            MessageBox.Show(
+            RacingTimeClock.Services.RacingPopupService.Show(
                 $"Could not load seasons.\n\n{ex}",
                 "Settings Error",
                 MessageBoxButton.OK,
@@ -243,4 +243,5 @@ public partial class SettingsView : UserControl
             $"Youth: {youthStart} and younger";
     }
 }
+
 

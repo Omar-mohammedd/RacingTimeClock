@@ -71,7 +71,7 @@ public partial class RacersView : UserControl
         }
         catch (Exception ex)
         {
-            MessageBox.Show(
+            RacingTimeClock.Services.RacingPopupService.Show(
                 $"Could not load racers.\n\n{ex.Message}",
                 "Racers Error",
                 MessageBoxButton.OK,
@@ -645,7 +645,7 @@ private static T? FindVisualChild<T>(
         }
         catch (Exception ex)
         {
-            MessageBox.Show(
+            RacingTimeClock.Services.RacingPopupService.Show(
                 $"Could not open racer details.\n\n{ex}",
                 "Racer Details Error",
                 MessageBoxButton.OK,
@@ -699,6 +699,7 @@ public class RacerDisplayItem
             ? "Active"
             : "Not Active";
 }
+
 
 
 

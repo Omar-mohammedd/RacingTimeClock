@@ -8,6 +8,7 @@
 
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes/Controls.xaml"/>
+            <ResourceDictionary Source="Themes/RacingPopupStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Global Colors -->
@@ -217,6 +218,7 @@
     </Application.Resources>
 
 </Application>
+
 
 
 

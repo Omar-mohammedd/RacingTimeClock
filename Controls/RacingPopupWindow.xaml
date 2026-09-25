@@ -1,0 +1,80 @@
+﻿<Window x:Class="RacingTimeClock.Controls.RacingPopupWindow" Style="{StaticResource RacingPopupWindowStyle}"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid Style="{StaticResource RacingPopupOverlayStyle}">
+
+        <Border x:Name="PopupCard"
+                Style="{StaticResource RacingPopupCardStyle}">
+
+            <Grid>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- HEADER -->
+
+                <Grid Grid.Row="0">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border x:Name="IconBorder"
+                            Grid.Column="0"
+                            Style="{StaticResource RacingPopupIconStyle}">
+
+                        <TextBlock x:Name="IconText"
+                                   Style="{StaticResource RacingPopupIconTextStyle}"/>
+
+                    </Border>
+
+                    <TextBlock x:Name="TitleText"
+                               Grid.Column="1"
+                               Style="{StaticResource RacingPopupTitleStyle}"/>
+
+                    <Button x:Name="CloseButton"
+                            Grid.Column="2"
+                            Style="{StaticResource RacingPopupCloseButtonStyle}"
+                            Content="×"
+                            Click="CloseButton_Click"/>
+
+                </Grid>
+
+                <!-- MESSAGE -->
+
+                <TextBlock x:Name="MessageText"
+                           Grid.Row="1"
+                           Style="{StaticResource RacingPopupMessageStyle}"/>
+
+                <!-- ACTIONS -->
+
+                <StackPanel x:Name="ButtonPanel"
+                            Grid.Row="2"
+                            Style="{StaticResource RacingPopupButtonPanelStyle}">
+
+                    <Button x:Name="SecondaryButton"
+                            Style="{StaticResource RacingPopupSecondaryButtonStyle}"
+                            Content="CANCEL"
+                            Click="SecondaryButton_Click"/>
+
+                    <Button x:Name="PrimaryButton"
+                            Style="{StaticResource RacingPopupPrimaryButtonStyle}"
+                            Content="OK"
+                            Click="PrimaryButton_Click"/>
+
+                </StackPanel>
+
+            </Grid>
+
+        </Border>
+
+    </Grid>
+
+</Window>
+

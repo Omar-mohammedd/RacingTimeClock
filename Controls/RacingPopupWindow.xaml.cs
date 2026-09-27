@@ -1,92 +1,106 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace RacingTimeClock.Controls;
 
-public partial class RacingPopupWindow : Window
+public partial class RacingPopupWindow : UserControl
 {
     public MessageBoxResult Result { get; private set; } =
         MessageBoxResult.None;
 
-    private readonly MessageBoxButton buttons;
+    public string PopupTitle { get; set; } =
+        "Racing Time Clock";
 
-    public RacingPopupWindow(
-        string title,
-        string message,
-        MessageBoxButton buttons,
-        MessageBoxImage image,
-        string primaryText,
-        bool destructive)
+    public string Message { get; set; } =
+        string.Empty;
+
+    public MessageBoxButton Buttons { get; set; } =
+        MessageBoxButton.OK;
+
+    public MessageBoxImage Image { get; set; } =
+        MessageBoxImage.None;
+
+    public string PrimaryButtonText { get; set; } =
+        "OK";
+
+    public string SecondaryButtonText { get; set; } =
+        "CANCEL";
+
+    public bool Destructive { get; set; }
+
+    public event EventHandler<MessageBoxResult>? Completed;
+
+    public RacingPopupWindow()
     {
         InitializeComponent();
 
-        this.buttons = buttons;
-
-        TitleText.Text = title;
-        MessageText.Text = message;
-        PrimaryButton.Content = primaryText;
-
-        ConfigureIcon(image);
-        ConfigureButtons(destructive);
+        Loaded += PopupWindow_Loaded;
     }
 
-    private void ConfigureIcon(MessageBoxImage image)
+    private void PopupWindow_Loaded(
+        object sender,
+        RoutedEventArgs e)
     {
-        string resourceName;
-        string symbol;
+        TitleText.Text = PopupTitle;
+        MessageText.Text = Message;
+        PrimaryButton.Content = PrimaryButtonText;
+        SecondaryButton.Content = SecondaryButtonText;
 
-        switch (image)
+        ConfigureIcon();
+        ConfigureButtons();
+
+        Focus();
+    }
+
+    private void ConfigureIcon()
+    {
+        switch (Image)
         {
             case MessageBoxImage.Error:
-                resourceName = "DangerBrush";
-                symbol = "!";
-                break;
-
             case MessageBoxImage.Warning:
-                resourceName = "DangerBrush";
-                symbol = "!";
-                break;
+                IconBorder.SetResourceReference(
+                    Border.BackgroundProperty,
+                    "DangerBrush");
 
-            case MessageBoxImage.Information:
-                resourceName = "AccentBrush";
-                symbol = "i";
+                IconText.Text = "!";
                 break;
 
             default:
-                resourceName = "AccentBrush";
-                symbol = "i";
+                IconBorder.SetResourceReference(
+                    Border.BackgroundProperty,
+                    "AccentBrush");
+
+                IconText.Text = "i";
                 break;
         }
-
-        IconBorder.Background =
-            (Brush)FindResource(resourceName);
-
-        IconText.Text = symbol;
     }
 
-    private void ConfigureButtons(bool destructive)
+    private void ConfigureButtons()
     {
         bool hasSecondary =
-            buttons == MessageBoxButton.YesNo ||
-            buttons == MessageBoxButton.YesNoCancel;
+            Buttons == MessageBoxButton.OKCancel ||
+            Buttons == MessageBoxButton.YesNo ||
+            Buttons == MessageBoxButton.YesNoCancel;
 
         SecondaryButton.Visibility =
             hasSecondary
                 ? Visibility.Visible
                 : Visibility.Collapsed;
 
-        if (destructive)
+        PrimaryButton.SetResourceReference(
+            Control.StyleProperty,
+            Destructive
+                ? "RacingPopupDangerButtonStyle"
+                : "RacingPopupPrimaryButtonStyle");
+
+        if (!hasSecondary)
         {
-            PrimaryButton.Style =
-                (Style)FindResource(
-                    "RacingPopupDangerButtonStyle");
+            PrimaryButton.Focus();
         }
         else
         {
-            PrimaryButton.Style =
-                (Style)FindResource(
-                    "RacingPopupPrimaryButtonStyle");
+            SecondaryButton.Focus();
         }
     }
 
@@ -94,41 +108,31 @@ public partial class RacingPopupWindow : Window
         object sender,
         RoutedEventArgs e)
     {
-        if (buttons == MessageBoxButton.YesNo ||
-            buttons == MessageBoxButton.YesNoCancel)
-        {
-            Result = MessageBoxResult.Yes;
-        }
-        else
-        {
-            Result = MessageBoxResult.OK;
-        }
+        Result =
+            Buttons == MessageBoxButton.YesNo ||
+            Buttons == MessageBoxButton.YesNoCancel
+                ? MessageBoxResult.Yes
+                : MessageBoxResult.OK;
 
-        DialogResult = true;
-        Close();
+        Complete();
     }
 
     private void SecondaryButton_Click(
         object sender,
         RoutedEventArgs e)
     {
-        Result = MessageBoxResult.No;
+        Result =
+            Buttons == MessageBoxButton.OKCancel
+                ? MessageBoxResult.Cancel
+                : MessageBoxResult.No;
 
-        DialogResult = false;
-        Close();
+        Complete();
     }
 
-    private void CloseButton_Click(
-        object sender,
-        RoutedEventArgs e)
+    private void Complete()
     {
-        Result =
-            buttons == MessageBoxButton.YesNo ||
-            buttons == MessageBoxButton.YesNoCancel
-                ? MessageBoxResult.No
-                : MessageBoxResult.Cancel;
-
-        DialogResult = false;
-        Close();
+        Completed?.Invoke(
+            this,
+            Result);
     }
 }

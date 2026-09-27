@@ -41,7 +41,8 @@ public partial class SettingsView : UserControl
 
         if (Window.GetWindow(this) is MainWindow mainWindow)
         {
-            FullScreenCheckBox.IsChecked = mainWindow.IsFullScreen;
+            FullScreenCheckBox.IsChecked =
+                mainWindow.WindowState == WindowState.Maximized;
         }
 
         loading = false;
@@ -270,7 +271,6 @@ public partial class SettingsView : UserControl
             $"Youth: {youthStart} and younger";
     }
 }
-
 
 
 

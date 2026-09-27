@@ -84,68 +84,13 @@
                                Margin="0,6,0,16"
                                TextWrapping="Wrap"/>
 
-                    <StackPanel Orientation="Horizontal"
-                                VerticalAlignment="Center">
-
-                        <CheckBox x:Name="FullScreenCheckBox"
-                                  Width="50"
-                                  Height="28"
-                                  VerticalAlignment="Center"
-                                  Checked="FullScreenCheckBox_Changed"
-                                  Unchecked="FullScreenCheckBox_Changed">
-
-                            <CheckBox.Template>
-                                <ControlTemplate TargetType="{x:Type CheckBox}">
-
-                                    <Grid Width="50"
-                                          Height="28">
-
-                                        <Border x:Name="ToggleTrack"
-                                                Width="50"
-                                                Height="28"
-                                                CornerRadius="14"
-                                                Background="{DynamicResource BorderBrush}"/>
-
-                                        <Ellipse x:Name="ToggleThumb"
-                                                 Width="22"
-                                                 Height="22"
-                                                 HorizontalAlignment="Left"
-                                                 VerticalAlignment="Center"
-                                                 Margin="3"
-                                                 Fill="{DynamicResource ButtonTextBrush}"/>
-
-                                    </Grid>
-
-                                    <ControlTemplate.Triggers>
-
-                                        <Trigger Property="IsChecked"
-                                                 Value="True">
-
-                                            <Setter TargetName="ToggleTrack"
-                                                    Property="Background"
-                                                    Value="{DynamicResource AccentBrush}"/>
-
-                                            <Setter TargetName="ToggleThumb"
-                                                    Property="HorizontalAlignment"
-                                                    Value="Right"/>
-
-                                        </Trigger>
-
-                                    </ControlTemplate.Triggers>
-
-                                </ControlTemplate>
-                            </CheckBox.Template>
-
-                        </CheckBox>
-
-                        <TextBlock Text="Enable Full Screen"
-                                   Margin="12,0,0,0"
-                                   VerticalAlignment="Center"
-                                   FontSize="13"
-                                   FontWeight="SemiBold"
-                                   Foreground="{DynamicResource TextPrimaryBrush}"/>
-
-                    </StackPanel>
+                    <CheckBox x:Name="FullScreenCheckBox"
+                              Content="Enable Full Screen"
+                              FontSize="13"
+                              FontWeight="SemiBold"
+                              Foreground="{DynamicResource TextPrimaryBrush}"
+                              Checked="FullScreenCheckBox_Changed"
+                              Unchecked="FullScreenCheckBox_Changed"/>
 
                 </StackPanel>
 
@@ -228,4 +173,3 @@
     </ScrollViewer>
 
 </UserControl>
-

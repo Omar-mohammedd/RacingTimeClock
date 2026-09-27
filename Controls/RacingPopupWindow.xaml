@@ -1,8 +1,13 @@
-﻿<Window x:Class="RacingTimeClock.Controls.RacingPopupWindow" Style="{StaticResource RacingPopupWindowStyle}"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+﻿<UserControl x:Class="RacingTimeClock.Controls.RacingPopupWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             HorizontalAlignment="Stretch"
+             VerticalAlignment="Stretch"
+             Focusable="True">
 
-    <Grid Style="{StaticResource RacingPopupOverlayStyle}">
+    <Grid Background="{DynamicResource RacingPopupOverlayBrush}"
+          HorizontalAlignment="Stretch"
+          VerticalAlignment="Stretch">
 
         <Border x:Name="PopupCard"
                 Style="{StaticResource RacingPopupCardStyle}">
@@ -22,7 +27,6 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
                     <Border x:Name="IconBorder"
@@ -37,12 +41,6 @@
                     <TextBlock x:Name="TitleText"
                                Grid.Column="1"
                                Style="{StaticResource RacingPopupTitleStyle}"/>
-
-                    <Button x:Name="CloseButton"
-                            Grid.Column="2"
-                            Style="{StaticResource RacingPopupCloseButtonStyle}"
-                            Content="×"
-                            Click="CloseButton_Click"/>
 
                 </Grid>
 
@@ -76,5 +74,4 @@
 
     </Grid>
 
-</Window>
-
+</UserControl>

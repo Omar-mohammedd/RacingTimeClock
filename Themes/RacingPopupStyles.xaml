@@ -5,44 +5,7 @@
 
     <SolidColorBrush x:Key="RacingPopupOverlayBrush"
                      Color="#99000000"/>
-
-    <Style x:Key="RacingPopupWindowStyle"
-           TargetType="{x:Type controls:RacingPopupWindow}">
-
-        <Setter Property="WindowStyle"
-                Value="None"/>
-
-        <Setter Property="ResizeMode"
-                Value="NoResize"/>
-
-        <Setter Property="AllowsTransparency"
-                Value="True"/>
-
-        <Setter Property="ShowInTaskbar"
-                Value="False"/>
-
-        <Setter Property="Background"
-                Value="Transparent"/>
-
-        <Setter Property="WindowStartupLocation"
-                Value="Manual"/>
-
-        <Setter Property="ShowActivated"
-                Value="True"/>
-
-    </Style>
-
-
-    <Style x:Key="RacingPopupOverlayStyle"
-           TargetType="{x:Type Grid}">
-
-        <Setter Property="Background"
-                Value="{DynamicResource RacingPopupOverlayBrush}"/>
-
-    </Style>
-
-
-    <Style x:Key="RacingPopupCardStyle"
+<Style x:Key="RacingPopupCardStyle"
            TargetType="{x:Type Border}">
 
         <Setter Property="Width"
@@ -301,70 +264,6 @@
                 Value="{DynamicResource ButtonSecondaryTextBrush}"/>
 
     </Style>
-
-
-    <Style x:Key="RacingPopupCloseButtonStyle"
-           TargetType="{x:Type Button}">
-
-        <Setter Property="Width"
-                Value="32"/>
-
-        <Setter Property="Height"
-                Value="32"/>
-
-        <Setter Property="Padding"
-                Value="0"/>
-
-        <Setter Property="FontSize"
-                Value="20"/>
-
-        <Setter Property="Background"
-                Value="Transparent"/>
-
-        <Setter Property="Foreground"
-                Value="{DynamicResource TextSecondaryBrush}"/>
-
-        <Setter Property="BorderThickness"
-                Value="0"/>
-
-        <Setter Property="Cursor"
-                Value="Hand"/>
-
-        <Setter Property="Template">
-
-            <Setter.Value>
-
-                <ControlTemplate TargetType="{x:Type Button}">
-
-                    <Border x:Name="CloseBorder"
-                            Background="{TemplateBinding Background}"
-                            CornerRadius="8">
-
-                        <ContentPresenter
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"/>
-
-                    </Border>
-
-                    <ControlTemplate.Triggers>
-
-                        <Trigger Property="IsMouseOver"
-                                 Value="True">
-
-                            <Setter TargetName="CloseBorder"
-                                    Property="Background"
-                                    Value="{DynamicResource ButtonSecondaryBrush}"/>
-
-                        </Trigger>
-
-                    </ControlTemplate.Triggers>
-
-                </ControlTemplate>
-
-            </Setter.Value>
-
-        </Setter>
-
-    </Style>
-
 </ResourceDictionary>
+
+

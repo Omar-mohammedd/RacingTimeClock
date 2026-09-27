@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Windows.Controls;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -9,7 +10,7 @@ using RacingTimeClock.Services;
 
 namespace RacingTimeClock.Views;
 
-public partial class RacerDetailsDialog : Window
+public partial class RacerDetailsView : UserControl
 {
     private readonly int racerId;
 
@@ -57,13 +58,13 @@ public partial class RacerDetailsDialog : Window
             $"{FinishTime.Milliseconds:000}";
     }
 
-    public RacerDetailsDialog(int racerDbId)
+    public RacerDetailsView(int racerDbId)
     {
         InitializeComponent();
 
         racerId = racerDbId;
 
-        Loaded += RacerDetailsDialog_Loaded;
+        Loaded += RacerDetailsView_Loaded;
         SizeChanged += (_, _) => UpdateHistoryDataGridClip();
     }
 
@@ -86,7 +87,7 @@ public partial class RacerDetailsDialog : Window
                 10);
     }
 
-    private async void RacerDetailsDialog_Loaded(
+    private async void RacerDetailsView_Loaded(
         object sender,
         RoutedEventArgs e)
     {
@@ -113,7 +114,7 @@ public partial class RacerDetailsDialog : Window
                     MessageBoxButton.OK,
                     MessageBoxImage.Error);
 
-                Close();
+                RequestBack();
                 return;
             }
 
@@ -252,10 +253,7 @@ RacerIdText.Text =
             return;
 
         RaceDetailsDialog dialog =
-            new RaceDetailsDialog(item.RaceId)
-            {
-                Owner = this
-            };
+            new RaceDetailsDialog(item.RaceId);
 
         dialog.ShowDialog();
 
@@ -824,7 +822,7 @@ RacerIdText.Visibility =
 
             WasDeleted = true;
 
-            Close();
+            RequestBack();
         }
         catch (Exception ex)
         {
@@ -840,59 +838,18 @@ RacerIdText.Visibility =
         object sender,
         RoutedEventArgs e)
     {
-        Close();
+        RequestBack();
     }
     
-    private void TitleBar_MouseLeftButtonDown(
-        object sender,
-        System.Windows.Input.MouseButtonEventArgs e)
+
+    public event EventHandler? BackRequested;
+
+    private void RequestBack()
     {
-        if (e.ChangedButton !=
-            System.Windows.Input.MouseButton.Left)
-        {
-            return;
-        }
-
-        if (e.ClickCount == 2)
-        {
-            MaximizeButton_Click(
-                sender,
-                e);
-
-            return;
-        }
-
-        try
-        {
-            DragMove();
-        }
-        catch (InvalidOperationException)
-        {
-        }
+        BackRequested?.Invoke(this, EventArgs.Empty);
     }
+}
 
-    private void MinimizeButton_Click(
-        object sender,
-        RoutedEventArgs e)
-    {
-        WindowState =
-            WindowState.Minimized;
-    }
 
-    private void MaximizeButton_Click(
-        object sender,
-        RoutedEventArgs e)
-    {
-        WindowState =
-            WindowState == WindowState.Maximized
-                ? WindowState.Normal
-                : WindowState.Maximized;
-    }
 
-    private void WindowCloseButton_Click(
-        object sender,
-        RoutedEventArgs e)
-    {
-        Close();
-    }}
 

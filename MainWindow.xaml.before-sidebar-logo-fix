@@ -131,17 +131,18 @@
 
                     <StackPanel Orientation="Horizontal">
 
-                        <Rectangle Width="28"
+                        <Border Width="28"
+                                Height="28"
+                                Background="{DynamicResource AccentBrush}"
+                                CornerRadius="7"
+                                VerticalAlignment="Center">
+
+                            <Image Source="assets/icons/LOGO.png"
+                                   Width="28"
                                    Height="28"
-                                   VerticalAlignment="Center"
-                                   Fill="{DynamicResource AccentBrush}">
+                                   Stretch="Uniform"/>
 
-                            <Rectangle.OpacityMask>
-                                <ImageBrush ImageSource="/assets/icons/LOGO.png"
-                                            Stretch="Uniform"/>
-                            </Rectangle.OpacityMask>
-
-                        </Rectangle>
+                        </Border>
 
 
                         <StackPanel Margin="9,0,0,0"
@@ -224,8 +225,6 @@
     </Grid>
 
 </Window>
-
-
 
 
 

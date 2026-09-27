@@ -390,9 +390,31 @@ private void UpdateRacersTableHeight()
         return;
     }
 
+    Grid? parentGrid =
+        RacersTableBorder.Parent as Grid;
+
+    if (parentGrid == null ||
+        parentGrid.ActualHeight <= 0)
+    {
+        return;
+    }
+
+    double availableHeight =
+        parentGrid.ActualHeight;
+
+    RacersDataGrid.Height =
+        availableHeight;
+
+    RacersTableBorder.Height =
+        availableHeight;
+
+    RacerScrollBar.Height =
+        Math.Max(
+            1,
+            availableHeight - 50);
+
     RacersTableBorder.ClipToBounds = true;
 }
-
 private void UpdateRacerScrollBar()
     {
         if (RacerScrollBar == null ||
@@ -662,7 +684,6 @@ public class RacerDisplayItem
             ? "Active"
             : "Not Active";
 }
-
 
 
 

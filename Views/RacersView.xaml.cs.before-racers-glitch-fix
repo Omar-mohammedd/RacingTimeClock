@@ -70,18 +70,9 @@ public partial class RacersView : UserControl
             }
 
             ApplyFilters();
-
-            Dispatcher.BeginInvoke(
-                new Action(() =>
-                {
-                    Opacity = 1;
-                }),
-                System.Windows.Threading.DispatcherPriority.ContextIdle);
         }
         catch (Exception ex)
         {
-            Opacity = 1;
-
             RacingTimeClock.Services.RacingPopupService.Show(
                 $"Could not load racers.\n\n{ex.Message}",
                 "Racers Error",
@@ -217,10 +208,18 @@ public partial class RacersView : UserControl
         }
 
         filtered =
-            SortRacers(filtered);        RacersDataGrid.ItemsSource =
-            filtered.ToList();
+            SortRacers(filtered);
 
-        UpdateFilterButtonText();
+        RacersDataGrid.ItemsSource =
+            filtered.ToList();
+        UpdateRacersTableHeight();
+
+        Dispatcher.BeginInvoke(
+            new Action(UpdateRacersTableHeight),
+            System.Windows.Threading.DispatcherPriority.Render);
+
+        UpdateRacersTableHeight();
+UpdateFilterButtonText();
         UpdateSortIndicators();
     }
 
@@ -390,9 +389,31 @@ private void UpdateRacersTableHeight()
         return;
     }
 
+    Grid? parentGrid =
+        RacersTableBorder.Parent as Grid;
+
+    if (parentGrid == null ||
+        parentGrid.ActualHeight <= 0)
+    {
+        return;
+    }
+
+    double availableHeight =
+        parentGrid.ActualHeight;
+
+    RacersDataGrid.Height =
+        availableHeight;
+
+    RacersTableBorder.Height =
+        availableHeight;
+
+    RacerScrollBar.Height =
+        Math.Max(
+            1,
+            availableHeight - 50);
+
     RacersTableBorder.ClipToBounds = true;
 }
-
 private void UpdateRacerScrollBar()
     {
         if (RacerScrollBar == null ||
@@ -662,9 +683,6 @@ public class RacerDisplayItem
             ? "Active"
             : "Not Active";
 }
-
-
-
 
 
 

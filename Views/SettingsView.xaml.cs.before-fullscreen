@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using RacingTimeClock;
 using RacingTimeClock.Models;
 using RacingTimeClock.Services;
 using RacingThemeMode = RacingTimeClock.Services.ThemeMode;
@@ -12,7 +11,6 @@ namespace RacingTimeClock.Views;
 
 public partial class SettingsView : UserControl
 {
-    public event EventHandler<bool>? FullScreenChanged;
     private List<Season> seasons = new();
 
     private bool loading;
@@ -28,37 +26,12 @@ public partial class SettingsView : UserControl
         object sender,
         RoutedEventArgs e)
     {
-        LoadFullScreen();
         LoadTheme();
         LoadAccent();
 
         await LoadSeasonsAsync();
     }
 
-    private void LoadFullScreen()
-    {
-        loading = true;
-
-        if (Window.GetWindow(this) is MainWindow mainWindow)
-        {
-            FullScreenCheckBox.IsChecked = mainWindow.IsFullScreen;
-        }
-
-        loading = false;
-    }
-
-    private void FullScreenCheckBox_Changed(
-        object sender,
-        RoutedEventArgs e)
-    {
-        if (loading)
-            return;
-
-        bool enabled =
-            FullScreenCheckBox.IsChecked == true;
-
-        FullScreenChanged?.Invoke(this, enabled);
-    }
     private void LoadTheme()
     {
         loading = true;
@@ -270,10 +243,5 @@ public partial class SettingsView : UserControl
             $"Youth: {youthStart} and younger";
     }
 }
-
-
-
-
-
 
 

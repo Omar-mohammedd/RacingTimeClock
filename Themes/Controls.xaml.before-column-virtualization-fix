@@ -478,7 +478,7 @@
                 Value="True"/>
 
         <Setter Property="EnableColumnVirtualization"
-                Value="False"/>
+                Value="True"/>
 
         <Setter Property="VirtualizingPanel.IsVirtualizing"
                 Value="True"/>

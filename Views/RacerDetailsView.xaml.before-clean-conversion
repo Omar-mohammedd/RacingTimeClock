@@ -1,79 +1,16 @@
-﻿<Window xmlns:controls="clr-namespace:RacingTimeClock.Controls" xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework" x:Class="RacingTimeClock.Views.RacerDetailsDialog"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Racer Details"
-        Height="780"
-        Width="920"
-        MinHeight="680"
-        MinWidth="820"
-        WindowStartupLocation="CenterOwner"
-        WindowStyle="None"
-        ResizeMode="CanResize"
-        Background="{DynamicResource PageBackgroundBrush}" PreviewMouseDown="Window_PreviewMouseDown">
-        <shell:WindowChrome.WindowChrome>
-            <shell:WindowChrome CaptionHeight="36"
-                                ResizeBorderThickness="6"
-                                CornerRadius="0"
-                                GlassFrameThickness="0"
-                                UseAeroCaptionButtons="False"/>
-        </shell:WindowChrome.WindowChrome>
+﻿<UserControl x:Class="RacingTimeClock.Views.RacerDetailsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:RacingTimeClock.Controls"
+             Background="{DynamicResource PageBackgroundBrush}"
+             PreviewMouseDown="Window_PreviewMouseDown">
+    <Grid>
+>
 
     <Grid>
 
-        <Border x:Name="CustomTitleBar"
-                Height="36"
-                VerticalAlignment="Top"
-                Background="{DynamicResource SurfaceBrush}"
-                BorderBrush="{DynamicResource BorderBrush}"
-                BorderThickness="0,0,0,1"
-                Panel.ZIndex="100"
-                MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
-
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="46"/>
-                    <ColumnDefinition Width="46"/>
-                    <ColumnDefinition Width="46"/>
-                </Grid.ColumnDefinitions>
-
-                <TextBlock Grid.Column="0"
-                           Text="Racer Details"
-                           Margin="14,0,0,0"
-                           VerticalAlignment="Center"
-                           Foreground="{DynamicResource TextPrimaryBrush}"
-                           FontSize="13"/>
-
-                <Button Grid.Column="1"
-                        Content="—"
-                        FontSize="14"
-                        Foreground="{DynamicResource TextSecondaryBrush}"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        shell:WindowChrome.IsHitTestVisibleInChrome="True"
-                        Click="MinimizeButton_Click"/>
-
-                <Button Grid.Column="2"
-                        Content="□"
-                        FontSize="12"
-                        Foreground="{DynamicResource TextSecondaryBrush}"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        shell:WindowChrome.IsHitTestVisibleInChrome="True"
-                        Click="MaximizeButton_Click"/>
-
-                <Button Grid.Column="3"
-                        Content="×"
-                        FontSize="18"
-                        Foreground="{DynamicResource TextSecondaryBrush}"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        shell:WindowChrome.IsHitTestVisibleInChrome="True"
-                        Click="WindowCloseButton_Click"/>
-
-            </Grid>
-        </Border>
-        <Grid Margin="30,66,30,30">
+        
+        <Grid Margin="30">
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -419,6 +356,10 @@
     </Grid>
 
     </Grid>
-</Window>
+    </Grid>
+</UserControl>
+
+
+
 
 

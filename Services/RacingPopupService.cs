@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Windows;
+using System.Windows.Documents;
+using System.Windows.Media;
+using System.Windows.Threading;
 using RacingTimeClock.Controls;
 
 namespace RacingTimeClock.Services;
@@ -14,23 +17,7 @@ public static class RacingPopupService
         MessageBoxImage image,
         MessageBoxResult defaultResult)
     {
-        try
-        {
-            return Show(
-                message,
-                title,
-                buttons,
-                image);
-        }
-        catch (Exception ex)
-        {
-            return ShowFallback(
-                message,
-                title,
-                buttons,
-                image,
-                ex);
-        }
+        return Show(message, title, buttons, image);
     }
 
     public static MessageBoxResult Show(
@@ -39,44 +26,13 @@ public static class RacingPopupService
         MessageBoxButton buttons,
         MessageBoxImage image)
     {
-        try
-        {
-            Window? owner =
-                Application.Current?
-                    .Windows
-                    .OfType<Window>()
-                    .FirstOrDefault(
-                        window =>
-                            window.IsVisible &&
-                            window.IsActive);
-
-            RacingPopupWindow popup =
-                new(
-                    title,
-                    message,
-                    buttons,
-                    image,
-                    buttons == MessageBoxButton.YesNo ||
-                    buttons == MessageBoxButton.YesNoCancel
-                        ? "CONFIRM"
-                        : "OK",
-                    image == MessageBoxImage.Error);
-
-            PrepareWindow(popup, owner);
-
-            popup.ShowDialog();
-
-            return popup.Result;
-        }
-        catch (Exception ex)
-        {
-            return ShowFallback(
-                message,
-                title,
-                buttons,
-                image,
-                ex);
-        }
+        return ShowPopup(
+            message,
+            title,
+            buttons,
+            image,
+            GetPrimaryText(buttons),
+            image == MessageBoxImage.Error);
     }
 
     public static MessageBoxResult Show(
@@ -118,41 +74,13 @@ public static class RacingPopupService
         string confirmText = "CONFIRM",
         bool destructive = false)
     {
-        try
-        {
-            Window? owner =
-                Application.Current?
-                    .Windows
-                    .OfType<Window>()
-                    .FirstOrDefault(
-                        window =>
-                            window.IsVisible &&
-                            window.IsActive);
-
-            RacingPopupWindow popup =
-                new(
-                    title,
-                    message,
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning,
-                    confirmText,
-                    destructive);
-
-            PrepareWindow(popup, owner);
-
-            popup.ShowDialog();
-
-            return popup.Result;
-        }
-        catch (Exception ex)
-        {
-            return ShowFallback(
-                message,
-                title,
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Warning,
-                ex);
-        }
+        return ShowPopup(
+            message,
+            title,
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Warning,
+            confirmText,
+            destructive);
     }
 
     public static bool Confirm(
@@ -165,54 +93,157 @@ public static class RacingPopupService
             title,
             message,
             confirmText,
-            destructive) == MessageBoxResult.Yes;
+            destructive) ==
+            MessageBoxResult.Yes;
     }
 
-    private static MessageBoxResult ShowFallback(
+    private static MessageBoxResult ShowPopup(
         string message,
         string title,
         MessageBoxButton buttons,
         MessageBoxImage image,
-        Exception exception)
+        string primaryText,
+        bool destructive)
     {
-        string fallbackMessage =
-            $"{message}\n\n" +
-            "The custom popup could not be displayed.\n\n" +
-            $"Technical details:\n{exception.Message}";
+        Window? owner =
+            Application.Current?
+                .Windows
+                .OfType<Window>()
+                .FirstOrDefault(
+                    window =>
+                        window.IsVisible &&
+                        window.IsActive);
 
-        return MessageBox.Show(
-            fallbackMessage,
-            title,
-            buttons,
-            image);
-    }
-
-    private static void PrepareWindow(
-        RacingPopupWindow popup,
-        Window? owner)
-    {
-        if (owner != null)
+        if (owner == null)
         {
-            popup.Owner = owner;
-
-            popup.Left = owner.Left;
-            popup.Top = owner.Top;
-            popup.Width = owner.ActualWidth;
-            popup.Height = owner.ActualHeight;
-
-            return;
+            return MessageBox.Show(
+                message,
+                title,
+                buttons,
+                image);
         }
 
-        popup.Left =
-            SystemParameters.WorkArea.Left;
+        UIElement? content =
+            owner.Content as UIElement;
 
-        popup.Top =
-            SystemParameters.WorkArea.Top;
+        if (content == null)
+        {
+            return MessageBox.Show(
+                message,
+                title,
+                buttons,
+                image);
+        }
 
-        popup.Width =
-            SystemParameters.WorkArea.Width;
+        AdornerLayer? layer =
+            FindAdornerLayer(content);
 
-        popup.Height =
-            SystemParameters.WorkArea.Height;
+        if (layer == null)
+        {
+            return MessageBox.Show(
+                message,
+                title,
+                buttons,
+                image);
+        }
+
+        RacingPopupWindow popup =
+            new()
+            {
+                PopupTitle = title,
+                Message = message,
+                Buttons = buttons,
+                Image = image,
+                PrimaryButtonText = primaryText,
+                SecondaryButtonText = "CANCEL",
+                Destructive = destructive
+            };
+
+        RacingPopupAdorner adorner =
+            new(content, popup);
+
+        MessageBoxResult result =
+            MessageBoxResult.None;
+
+        DispatcherFrame frame =
+            new();
+
+        void Complete(
+            object? sender,
+            MessageBoxResult popupResult)
+        {
+            result = popupResult;
+            frame.Continue = false;
+        }
+
+        void OwnerClosed(
+            object? sender,
+            EventArgs e)
+        {
+            result = MessageBoxResult.Cancel;
+            frame.Continue = false;
+        }
+
+        popup.Completed += Complete;
+        owner.Closed += OwnerClosed;
+
+        try
+        {
+            layer.Add(adorner);
+
+            popup.Focus();
+
+            Dispatcher.PushFrame(frame);
+
+            return result == MessageBoxResult.None
+                ? MessageBoxResult.Cancel
+                : result;
+        }
+        finally
+        {
+            popup.Completed -= Complete;
+            owner.Closed -= OwnerClosed;
+
+            if (layer.GetAdorners(content)
+                ?.Contains(adorner) == true)
+            {
+                layer.Remove(adorner);
+            }
+        }
+    }
+
+    private static AdornerLayer? FindAdornerLayer(
+        DependencyObject element)
+    {
+        DependencyObject? current = element;
+
+        while (current != null)
+        {
+            if (current is UIElement uiElement)
+            {
+                AdornerLayer? layer =
+                    AdornerLayer.GetAdornerLayer(
+                        uiElement);
+
+                if (layer != null)
+                {
+                    return layer;
+                }
+            }
+
+            current =
+                VisualTreeHelper.GetParent(current);
+        }
+
+        return null;
+    }
+
+    private static string GetPrimaryText(
+        MessageBoxButton buttons)
+    {
+        return buttons == MessageBoxButton.YesNo ||
+               buttons == MessageBoxButton.YesNoCancel
+            ? "CONFIRM"
+            : "OK";
     }
 }
